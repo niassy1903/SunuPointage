@@ -1,0 +1,23 @@
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background-color: #8DBB36;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .btn-primary, .btn-success {
+    margin-right: 1rem;
+  }
+  

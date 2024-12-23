@@ -1,0 +1,165 @@
+<app-sidebar></app-sidebar>
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header bg-light">
+      <h2 class="text-center">Inscription d'un Utilisateur</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()">
+        <div class="form-group row">
+          <label for="nom" class="col-sm-2 col-form-label">Nom</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="nom" formControlName="nom">
+            <div *ngIf="inscriptionForm.get('nom')?.invalid && inscriptionForm.get('nom')?.touched" class="text-danger">
+              Nom est requis.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="prenom" formControlName="prenom">
+            <div *ngIf="inscriptionForm.get('prenom')?.invalid && inscriptionForm.get('prenom')?.touched" class="text-danger">
+              Prénom est requis.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="email" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control" id="email" formControlName="email">
+            <div *ngIf="inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched" class="text-danger">
+              Email est requis et doit être valide.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="adresse" class="col-sm-2 col-form-label">Adresse</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="adresse" formControlName="adresse">
+            <div *ngIf="inscriptionForm.get('adresse')?.invalid && inscriptionForm.get('adresse')?.touched" class="text-danger">
+              Adresse est requise.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="telephone" class="col-sm-2 col-form-label">Téléphone</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="telephone" formControlName="telephone">
+            <div *ngIf="inscriptionForm.get('telephone')?.invalid && inscriptionForm.get('telephone')?.touched" class="text-danger">
+              Téléphone est requis.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="fonction" class="col-sm-2 col-form-label">Fonction</label>
+          <div class="col-sm-10">
+            <select class="form-control" id="fonction" formControlName="fonction" (change)="onFonctionChange()">
+              <option value="vigile">Vigile</option>
+              <option value="apprenant">Apprenant</option>
+              <option value="employer">Employer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div *ngIf="inscriptionForm.get('fonction')?.invalid && inscriptionForm.get('fonction')?.touched" class="text-danger">
+              Fonction est requise.
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showNextStep">
+          <div *ngIf="fonction === 'vigile'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="password" formControlName="password">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="confirmPassword" class="col-sm-2 col-form-label">Confirmer le mot de passe</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword">
+              </div>
+            </div>
+            
+          </div>
+          <div *ngIf="fonction === 'apprenant'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="departement" class="col-sm-2 col-form-label">Département</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="departement" formControlName="departement">
+                  <option *ngFor="let departement of departements" [value]="departement._id">{{ departement.nom }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="cohorte" class="col-sm-2 col-form-label">Cohorte</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="cohorte" formControlName="cohorte">
+                  <option *ngFor="let cohorte of cohortes" [value]="cohorte._id">{{ cohorte.nom }}</option>
+                </select>
+              </div>
+            </div>
+           
+          </div>
+          <div *ngIf="fonction === 'employer'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="departement" class="col-sm-2 col-form-label">Département</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="departement" formControlName="departement">
+                  <option *ngFor="let departement of departements" [value]="departement._id">{{ departement.nom }}</option>
+                </select>
+              </div>
+            </div>
+           
+          </div>
+          <div *ngIf="fonction === 'admin'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="password" formControlName="password">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="confirmPassword" class="col-sm-2 col-form-label">Confirmer le mot de passe</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword">
+              </div>
+            </div>
+           
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-10 offset-sm-2">
+            <button type="button" class="btn btn-primary" [disabled]="!inscriptionForm.valid" (click)="nextStep()">Suivant</button>
+            <button type="submit" class="btn btn-success" *ngIf="showNextStep">Soumettre</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

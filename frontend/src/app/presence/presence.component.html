@@ -1,0 +1,67 @@
+<app-sidebar></app-sidebar>
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Aperçu des présences</h2>
+
+  <!-- Barre de recherche, calendrier et bouton Filtrer -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <input
+      type="text"
+      class="form-control w-50 mb-2"
+      placeholder="Rechercher un employé..."
+      [(ngModel)]="searchText"
+    />
+
+         <!-- Date actuelle avec bordure et icône calendrier -->
+    <div class="date-container d-flex align-items-center">
+      <span class="current-date mr-2">{{ currentDate }}</span>
+      <button class="btn date-button">
+        <i class="bi bi-calendar"></i>
+      </button>
+    </div>
+
+    <button class="btn btn-success d-flex align-items-center mb-2">
+      <i class="bi bi-funnel-fill mr-2"></i> Filtres avancés
+    </button>
+  </div>
+
+  <!-- Tableau des présences -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th>ID</th>
+          <th>Employé</th>
+          <th>Rôle</th>
+          <th>Département</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Arrivée</th>
+          <th>Départ</th>
+          <th>Temps de travail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let presence of filteredPresences">
+          <td>{{ presence.id }}</td>
+          <td>{{ presence.employe }}</td>
+          <td>{{ presence.role }}</td>
+          <td>{{ presence.departement }}</td>
+          <td>{{ presence.date }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="getStatusBadgeClass(presence.statut)"
+            >
+              {{ presence.statut }}
+            </span>
+          </td>
+          <td>{{ presence.arrivee }}</td>
+          <td>{{ presence.depart }}</td>
+          <td>{{ presence.tempsTravail }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

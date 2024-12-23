@@ -1,0 +1,34 @@
+/* Navbar */
+.navbar {
+    background-color: #f8f9fa; /* Couleur de fond claire */
+}
+
+.navbar .navbar-brand {
+    color: #8DBB36 !important; /* Couleur du logo */
+}
+
+.navbar .navbar-brand:hover {
+    color: #5a9c27 !important; /* Couleur au survol */
+}
+
+.navbar .text-end {
+    font-size: 14px;
+    text-align: right;
+}
+
+.navbar .text-end small {
+    color: #6c757d;
+}
+
+.navbar .rounded-circle {
+    border: 2px solid #8DBB36;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff; /* Logo en blanc */
+    text-align: center;
+    margin-bottom: 30px;
+}
+

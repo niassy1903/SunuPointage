@@ -1,0 +1,26 @@
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-title {
+    color: #3c763d;
+    background-color: #dff0d8;
+    padding: 8px;
+    border-radius: 4px 4px 0 0;
+  }
+  
+  .card-text {
+    color: #333;
+  }
+  
+  .pagination .page-item.active .page-link {
+    background-color: #3c763d;
+    border-color: #3c763d;
+  }
+  
+  .pagination .page-link {
+    color: #3c763d;
+  }
+  
