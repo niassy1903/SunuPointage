@@ -11,6 +11,7 @@ export class UtilisateurService {
   private apiUrl = 'http://127.0.0.1:8000/api/utilisateurs';
 
   private apiUrl1 = 'http://127.0.0.1:8000/api';
+  
 
  
 
@@ -29,6 +30,13 @@ export class UtilisateurService {
   );
 }
 
+getUtilisateursByDepartment(departmentId: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl1}/departements/${departmentId}`);
+}
+
+getUtilisateursByDepartmentAndFunction(departmentId: string, functionName: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl1}/departements/${departmentId}/function/${functionName}`);
+}
   redirectBasedOnRole(utilisateur: any) {
     if (utilisateur.fonction === 'admin') {
       this.router.navigate(['/dashboard']);

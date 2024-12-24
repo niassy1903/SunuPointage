@@ -9,6 +9,7 @@ import { DepartementComponent } from './departement/departement.component';
 import { CohorteComponent } from './cohorte/cohorte.component';
 import { HistoriqueComponent } from './historique/historique.component';
 import { InscriptionComponent } from './inscription/inscription.component';
+import { ListeComponent } from './liste/liste.component';
 
 
 export const routes: Routes = [
@@ -22,6 +23,8 @@ export const routes: Routes = [
     {path: 'cohorte',component:CohorteComponent},
     {path: 'historique',component:HistoriqueComponent},
     {path: 'inscription',component:InscriptionComponent},
+    { path: 'departement/:id', component: ListeComponent },
+    {path:'liste',component:ListeComponent},
 
 
 ];

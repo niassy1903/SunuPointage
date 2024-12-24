@@ -7,28 +7,28 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { UtilisateurService } from '../utilisateur.service';
 import { CohorteService } from '../cohorte.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-departement',
   templateUrl: './departement.component.html',
   styleUrls: ['./departement.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule, SidebarComponent, NavbarComponent,HttpClientModule],
-  providers: [UtilisateurService,CohorteService,DepartementService]
+  imports: [FormsModule, CommonModule, SidebarComponent, NavbarComponent, HttpClientModule],
+  providers: [UtilisateurService, CohorteService, DepartementService]
 })
 export class DepartementComponent implements OnInit {
   departments: any[] = []; // Stockage des départements récupérés
   currentPage: number = 1;
-  itemsPerPage: number = 9;
+  itemsPerPage: number = 6; // Modifié pour afficher 6 éléments par page
   totalPages: number = 1;
 
-  constructor(private departementService: DepartementService) {}
+  constructor(private departementService: DepartementService, private utilisateurService: UtilisateurService, private router: Router) {}
 
   ngOnInit() {
     this.loadDepartments();
   }
 
- 
   // Fonction pour charger les départements
   loadDepartments() {
     this.departementService.getDepartements().subscribe({
@@ -71,4 +71,17 @@ export class DepartementComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.departments.slice(startIndex, startIndex + this.itemsPerPage);
   }
+
+  // Fonction pour rediriger vers la liste des employés d'un département
+  showEmployees(department: any) {
+    this.router.navigate(['/departement', department.id]);
+  }
+  generatePageArray() {
+    return Array(this.totalPages).fill(0).map((x, i) => i);
+  }
 }
+
+
+
+
+   // Générer un tableau de pages pour la pagination

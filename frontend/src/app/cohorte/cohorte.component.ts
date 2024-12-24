@@ -68,4 +68,13 @@ export class CohorteComponent implements OnInit {
   exportCSV() {
     console.log('Exporter en CSV - À implémenter');
   }
+
+  getPaginatedCohortes() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.cohortes.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  generatePageArray() {
+    return Array(this.totalPages).fill(0).map((x, i) => i);
+  }
 }
