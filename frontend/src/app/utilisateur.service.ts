@@ -10,6 +10,8 @@ import { Router } from '@angular/router';
 export class UtilisateurService {
   private apiUrl = 'http://127.0.0.1:8000/api/utilisateurs';
 
+  private apiUrl1 = 'http://127.0.0.1:8000/api';
+
  
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -20,7 +22,7 @@ export class UtilisateurService {
 
   console.log('Login attempt with body:', body); // Vérifie les données envoyées
 
-  return this.http.post(`${this.apiUrl}/login`, body, { headers }).pipe(
+  return this.http.post(`${this.apiUrl1}/login`, body, { headers }).pipe(
     tap(response => {
       console.log('Login response:', response); // Affiche la réponse du serveur
     })
