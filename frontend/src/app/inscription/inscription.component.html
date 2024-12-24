@@ -78,16 +78,21 @@
             <div class="form-group row">
               <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="password" formControlName="password">
+                <input type="password" class="form-control" id="password" formControlName="mot_de_passe">
+                <div *ngIf="inscriptionForm.get('mot_de_passe')?.invalid && inscriptionForm.get('mot_de_passe')?.touched" class="text-danger">
+                  Mot de passe est requis et doit avoir au moins 6 caractères.
+                </div>
               </div>
             </div>
             <div class="form-group row">
               <label for="confirmPassword" class="col-sm-2 col-form-label">Confirmer le mot de passe</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword">
+                <input type="password" class="form-control" id="confirmPassword" formControlName="confirm_mot_de_passe">
+                <div *ngIf="inscriptionForm.get('confirm_mot_de_passe')?.invalid && inscriptionForm.get('confirm_mot_de_passe')?.touched" class="text-danger">
+                  Confirmation du mot de passe est requise et doit correspondre au mot de passe.
+                </div>
               </div>
             </div>
-            
           </div>
           <div *ngIf="fonction === 'apprenant'">
             <div class="form-group row">
@@ -100,7 +105,7 @@
               <label for="departement" class="col-sm-2 col-form-label">Département</label>
               <div class="col-sm-10">
                 <select class="form-control" id="departement" formControlName="departement">
-                  <option *ngFor="let departement of departements" [value]="departement._id">{{ departement.nom }}</option>
+                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
                 </select>
               </div>
             </div>
@@ -108,11 +113,10 @@
               <label for="cohorte" class="col-sm-2 col-form-label">Cohorte</label>
               <div class="col-sm-10">
                 <select class="form-control" id="cohorte" formControlName="cohorte">
-                  <option *ngFor="let cohorte of cohortes" [value]="cohorte._id">{{ cohorte.nom }}</option>
+                  <option *ngFor="let cohorte of cohortes" [value]="cohorte.nom">{{ cohorte.nom }}</option>
                 </select>
               </div>
             </div>
-           
           </div>
           <div *ngIf="fonction === 'employer'">
             <div class="form-group row">
@@ -125,11 +129,10 @@
               <label for="departement" class="col-sm-2 col-form-label">Département</label>
               <div class="col-sm-10">
                 <select class="form-control" id="departement" formControlName="departement">
-                  <option *ngFor="let departement of departements" [value]="departement._id">{{ departement.nom }}</option>
+                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
                 </select>
               </div>
             </div>
-           
           </div>
           <div *ngIf="fonction === 'admin'">
             <div class="form-group row">
@@ -141,16 +144,21 @@
             <div class="form-group row">
               <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="password" formControlName="password">
+                <input type="password" class="form-control" id="password" formControlName="mot_de_passe">
+                <div *ngIf="inscriptionForm.get('mot_de_passe')?.invalid && inscriptionForm.get('mot_de_passe')?.touched" class="text-danger">
+                  Mot de passe est requis et doit avoir au moins 6 caractères.
+                </div>
               </div>
             </div>
             <div class="form-group row">
               <label for="confirmPassword" class="col-sm-2 col-form-label">Confirmer le mot de passe</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword">
+                <input type="password" class="form-control" id="confirmPassword" formControlName="confirm_mot_de_passe">
+                <div *ngIf="inscriptionForm.get('confirm_mot_de_passe')?.invalid && inscriptionForm.get('confirm_mot_de_passe')?.touched" class="text-danger">
+                  Confirmation du mot de passe est requise et doit correspondre au mot de passe.
+                </div>
               </div>
             </div>
-           
           </div>
         </div>
         <div class="form-group row">

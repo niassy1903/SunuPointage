@@ -42,10 +42,9 @@ export class InscriptionComponent implements OnInit {
       photo: [''],
       departement: [''],
       cohorte: [''],
-      password: [''],
-      confirmPassword: [''],
-     
-    });
+      mot_de_passe: ['', [Validators.minLength(6)]],
+      confirm_mot_de_passe: ['', [Validators.minLength(6)]],
+    }, { validator: this.passwordMatchValidator });
   }
 
   ngOnInit() {
@@ -63,6 +62,12 @@ export class InscriptionComponent implements OnInit {
     }
   }
 
+  passwordMatchValidator(formGroup: FormGroup) {
+    return formGroup.get('mot_de_passe')?.value === formGroup.get('confirm_mot_de_passe')?.value
+      ? null
+      : { mismatch: true };
+  }
+
   onFonctionChange() {
     const fonctionControl = this.inscriptionForm.get('fonction');
     if (fonctionControl) {
@@ -76,7 +81,12 @@ export class InscriptionComponent implements OnInit {
 
   onSubmit() {
     if (this.inscriptionForm.valid) {
-      this.utilisateurService.createUtilisateur(this.inscriptionForm.value).subscribe(
+      const formData = this.inscriptionForm.value;
+      // Ensure the password fields are included in the form data
+      formData.mot_de_passe = formData.mot_de_passe || '';
+      formData.confirm_mot_de_passe = formData.confirm_mot_de_passe || '';
+
+      this.utilisateurService.createUtilisateur(formData).subscribe(
         response => {
           console.log('Utilisateur créé avec succès', response);
           // Redirection vers la page des utilisateurs
@@ -88,5 +98,4 @@ export class InscriptionComponent implements OnInit {
       );
     }
   }
-  
 }
