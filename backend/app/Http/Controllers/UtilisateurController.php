@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Utilisateur;
@@ -36,30 +37,33 @@ class UtilisateurController extends Controller
     // Créer un nouvel utilisateur
     public function store(Request $request)
     {
-        $request->validate([
-            'nom' => 'required',
-            'prenom' => 'required',
-            'email' => 'required|email|unique:utilisateurs',
-            'adresse' => 'required',
-            'telephone' => 'required',
-            'fonction' => 'required|in:apprenant,vigile,admin,employer',
-            'photo' => 'nullable',
-            'departement_id' => 'nullable|exists:departements,_id',
-            'cohorte_id' => 'nullable|exists:cohortes,_id',
-            'mot_de_passe' => 'nullable|min:6|same:confirm_mot_de_passe',
-            'confirm_mot_de_passe' => 'nullable|min:6',
-        ]);
+        try {
+            $request->validate([
+                'nom' => 'required',
+                'prenom' => 'required',
+                'email' => 'required|email|unique:utilisateurs',
+                'adresse' => 'required',
+                'telephone' => 'required',
+                'fonction' => 'required|in:apprenant,vigile,admin,employer',
+                'photo' => 'nullable',
+                'departement' => 'nullable|string',
+                'cohorte' => 'nullable|string',
+                'mot_de_passe' => 'nullable|min:6|same:confirm_mot_de_passe',
+                'confirm_mot_de_passe' => 'nullable|min:6',
+            ]);
 
-        $matricule = $this->generateMatricule();
+            $matricule = $this->generateMatricule();
 
-        $data = $request->all();
-        $data['matricule'] = $matricule;
+            $data = $request->all();
+            $data['matricule'] = $matricule;
 
-        if (!empty($request->mot_de_passe)) {
-            $data['mot_de_passe'] = bcrypt($request->mot_de_passe);
+            // Le mot de passe sera haché automatiquement par le setter dans le modèle
+            $utilisateur = Utilisateur::create($data);
+
+            return response()->json(['message' => 'Utilisateur créé avec succès.', 'utilisateur' => $utilisateur], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la création de l\'utilisateur.', 'error' => $e->getMessage()], 500);
         }
-
-        return Utilisateur::create($data);
     }
 
     protected function generateMatricule()
@@ -92,11 +96,10 @@ class UtilisateurController extends Controller
             'telephone' => 'sometimes|required',
             'fonction' => 'sometimes|required|in:apprenant,vigile,admin,employer',
             'photo' => 'nullable',
-            'departement_id' => 'nullable|exists:departements,_id',
-            'cohorte_id' => 'nullable|exists:cohortes,_id',
+            'departement' => 'nullable|string',
+            'cohorte' => 'nullable|string',
             'mot_de_passe' => 'nullable|min:6|same:confirm_mot_de_passe',
             'confirm_mot_de_passe' => 'nullable|min:6',
-
         ]);
 
         $data = $request->all();
@@ -119,23 +122,23 @@ class UtilisateurController extends Controller
         return response()->json(['message' => 'Utilisateur supprimé avec succès.'], 204);
     }
 
-   // Méthode pour bloquer un utilisateur
-   public function bloquer($id)
-   {
-       $utilisateur = Utilisateur::findOrFail($id);
-       $utilisateur->update(['status' => 'bloqué']);
+    // Méthode pour bloquer un utilisateur
+    public function bloquer($id)
+    {
+        $utilisateur = Utilisateur::findOrFail($id);
+        $utilisateur->update(['status' => 'bloqué']);
 
-       return response()->json(['message' => 'Utilisateur bloqué avec succès.']);
-   }
+        return response()->json(['message' => 'Utilisateur bloqué avec succès.']);
+    }
 
-   // Méthode pour réactiver un utilisateur
-   public function reactiver($id)
-   {
-       $utilisateur = Utilisateur::findOrFail($id);
-       $utilisateur->update(['status' => 'actif']);
+    // Méthode pour réactiver un utilisateur
+    public function reactiver($id)
+    {
+        $utilisateur = Utilisateur::findOrFail($id);
+        $utilisateur->update(['status' => 'actif']);
 
-       return response()->json(['message' => 'Utilisateur réactivé avec succès.']);
-   }
+        return response()->json(['message' => 'Utilisateur réactivé avec succès.']);
+    }
 
     // Modifier un utilisateur
     public function modifier(Request $request, $id)

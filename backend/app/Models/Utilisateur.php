@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
@@ -24,8 +25,8 @@ class Utilisateur extends Model
         'date_creation',
         'date_suppression',
         'date_modification',
-        'departement_id',
-        'cohorte_id',
+        'departement',
+        'cohorte',
         'matricule',
         'status', // Nouveau champ ajouté
     ];
@@ -72,17 +73,5 @@ class Utilisateur extends Model
             throw new \InvalidArgumentException("Invalid function value.");
         }
         $this->attributes['fonction'] = $value;
-    }
-
-    // Relation avec le département
-    public function departement()
-    {
-        return $this->belongsTo(Departement::class, 'departement_id', '_id');
-    }
-
-    // Relation avec la cohorte
-    public function cohorte()
-    {
-        return $this->belongsTo(Cohorte::class, 'cohorte_id', '_id');
     }
 }
