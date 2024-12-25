@@ -145,4 +145,31 @@ class UtilisateurController extends Controller
     {
         return $this->update($request, $id); // Réutilise la méthode "update"
     }
+
+        
+    public function getEmployersByDepartment($departement)
+    {
+        $employers = Utilisateur::where('fonction', 'employer')
+                                ->where('departement', $departement)
+                                ->get();
+    
+        if ($employers->isEmpty()) {
+            return response()->json(['message' => 'Aucun employé trouvé pour ce département'], 404);
+        }
+    
+        return response()->json($employers, 200);
+    }
+    
+    
+        // Méthode pour obtenir le nombre d'apprenants dans une cohorte spécifique
+        public function getApprenantsByCohorte($cohorte)
+        {
+            $apprenants = Utilisateur::where('fonction', 'apprenant')
+                                     ->where('cohorte', $cohorte)
+                                     ->count();
+    
+            return response()->json(['cohorte' => $cohorte, 'nombre_apprenants' => $apprenants], 200);
+        }
+
+
 }

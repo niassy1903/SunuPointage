@@ -16,6 +16,19 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('utilisateurs', UtilisateurController::class);
 
+
+Route::get('employers/{departement}', [UtilisateurController::class, 'getEmployersByDepartment']);
+
+
+
+Route::get('/utilisateurs/apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getApprenantsByCohorte']);
+
+
+
+
+
+
+
 Route::post('login', [UtilisateurController::class, 'login']);
 
 
@@ -25,3 +38,5 @@ Route::apiResource('cohortes', CohorteController::class);
 
 // routes/api.php
 Route::patch('/utilisateurs/{id}/bloquer', [UtilisateurController::class, 'bloquer']);
+
+Route::get('/telephones/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);

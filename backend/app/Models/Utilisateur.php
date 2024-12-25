@@ -74,4 +74,10 @@ class Utilisateur extends Model
         }
         $this->attributes['fonction'] = $value;
     }
+
+    public function checkTelephoneExists($telephone)
+    {
+        $exists = Utilisateur::where('telephone', $telephone)->exists();
+        return response()->json(['exists' => $exists]);
+    }
 }
