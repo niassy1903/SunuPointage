@@ -14,10 +14,13 @@ interface User {
   photo: string;
   firstName: string;
   lastName: string;
+  fonction: string;
   status: string;
   email: string;
   matricule: string;
   address: string;
+  departement: string;
+  cohorte: string;
   selected?: boolean; // Ajout de la propriété selected pour gérer la sélection
 }
 
@@ -37,9 +40,11 @@ export class UtilisateurComponent implements OnInit {
   filteredUsers: User[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
-  itemsPerPage: number = 5;
+  itemsPerPage: number = 4;
   selectAll: boolean = false;
   selectedUsersCount: number = 0;
+  userToDelete: User | null = null;
+  userToBlock: User | null = null;
 
   ngOnInit() {
     // Appel du service pour récupérer les utilisateurs
@@ -51,10 +56,13 @@ export class UtilisateurComponent implements OnInit {
           photo: '/images/profil.png',
           firstName: user.nom,
           lastName: user.prenom,
-          status: user.fonction,
+          fonction: user.fonction,
+          status: user.status,
           email: user.email,
           matricule: user.matricule,
-          address: user.adresse
+          address: user.adresse,
+          departement: user.departement, // Ajout de la propriété departement
+          cohorte: user.cohorte // Ajout de la propriété cohorte
         }));
         // Mettre à jour la pagination
         this.updatePagination();
@@ -96,10 +104,9 @@ export class UtilisateurComponent implements OnInit {
     const end = start + this.itemsPerPage;
     this.filteredUsers = this.users.slice(start, end);
   }
-  
-  
+
   editUser(user: User) {
-    // Logique pour éditer un utilisateur
+    this.router.navigate(['/edit', user.id]);
   }
 
   // Ajout d'un utilisateur
@@ -108,83 +115,90 @@ export class UtilisateurComponent implements OnInit {
   }
 
   // Suppression d'un utilisateur
-  deleteUser(user: User) {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer ${user.firstName} ${user.lastName} ?`)) {
-      this.utilisateurService.deleteUtilisateur(user.id).subscribe(
+  setUserToDelete(user: User) {
+    this.userToDelete = user;
+  }
+
+  confirmDeleteUser() {
+    if (this.userToDelete) {
+      this.utilisateurService.deleteUtilisateur(this.userToDelete.id).subscribe(
         () => {
-          this.users = this.users.filter(u => u.id !== user.id);
-          this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
-          alert('Utilisateur supprimé avec succès.');
+          this.users = this.users.filter(u => u.id !== this.userToDelete!.id);
+          this.filteredUsers = this.filteredUsers.filter(u => u.id !== this.userToDelete!.id);
+          this.userToDelete = null;
+          document.getElementById('deleteModal')?.click(); // Fermer le modal
         },
         (error) => {
           console.error('Erreur lors de la suppression de l\'utilisateur :', error);
-          alert('Une erreur est survenue lors de la suppression.');
         }
       );
     }
   }
 
   // Blocage d'un utilisateur
-  blockUser(user: User) {
-    if (confirm(`Êtes-vous sûr de vouloir bloquer ${user.firstName} ${user.lastName} ?`)) {
-      this.utilisateurService.blockUtilisateur(user.id).subscribe(
+  setUserToBlock(user: User) {
+    this.userToBlock = user;
+  }
+
+  confirmBlockUser() {
+    if (this.userToBlock !== null) { // Vérifie si userToBlock n'est pas null
+      this.utilisateurService.blockUtilisateur(this.userToBlock.id).subscribe(
         () => {
-          user.status = 'Bloqué';
-          alert('Utilisateur bloqué avec succès.');
+          // Assurez-vous de ne pas obtenir une erreur en accédant à `userToBlock`
+          if (this.userToBlock) {
+            this.userToBlock.status = 'Bloqué';
+          }
+          this.userToBlock = null;
+          document.getElementById('blockModal')?.click(); // Fermer le modal
         },
         (error) => {
           console.error('Erreur lors du blocage de l\'utilisateur :', error);
-          alert('Une erreur est survenue lors du blocage.');
         }
       );
+    } else {
+      console.error('L\'utilisateur à bloquer est introuvable.');
     }
   }
-
+  
   // Suppression des utilisateurs sélectionnés
-  deleteSelectedUsers() {
+  confirmDeleteSelectedUsers() {
     const selectedUsers = this.filteredUsers.filter(user => user.selected);
     if (selectedUsers.length === 0) {
-      alert('Aucun utilisateur sélectionné.');
+      console.error('Aucun utilisateur sélectionné.');
       return;
     }
-    if (confirm('Êtes-vous sûr de vouloir supprimer les utilisateurs sélectionnés ?')) {
-      selectedUsers.forEach(user => {
-        this.utilisateurService.deleteUtilisateur(user.id).subscribe(
-          () => {
-            this.users = this.users.filter(u => u.id !== user.id);
-            this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
-          },
-          (error) => {
-            console.error('Erreur lors de la suppression des utilisateurs :', error);
-            alert('Une erreur est survenue lors de la suppression.');
-          }
-        );
-      });
-      alert('Utilisateurs supprimés avec succès.');
-    }
+    selectedUsers.forEach(user => {
+      this.utilisateurService.deleteUtilisateur(user.id).subscribe(
+        () => {
+          this.users = this.users.filter(u => u.id !== user.id);
+          this.filteredUsers = this.filteredUsers.filter(u => u.id !== user.id);
+        },
+        (error) => {
+          console.error('Erreur lors de la suppression des utilisateurs :', error);
+        }
+      );
+    });
+    document.getElementById('deleteSelectedModal')?.click(); // Fermer le modal
   }
 
   // Blocage des utilisateurs sélectionnés
-  blockSelectedUsers() {
+  confirmBlockSelectedUsers() {
     const selectedUsers = this.filteredUsers.filter(user => user.selected);
     if (selectedUsers.length === 0) {
-      alert('Aucun utilisateur sélectionné.');
+      console.error('Aucun utilisateur sélectionné.');
       return;
     }
-    if (confirm('Êtes-vous sûr de vouloir bloquer les utilisateurs sélectionnés ?')) {
-      selectedUsers.forEach(user => {
-        this.utilisateurService.blockUtilisateur(user.id).subscribe(
-          () => {
-            user.status = 'Bloqué';
-          },
-          (error) => {
-            console.error('Erreur lors du blocage des utilisateurs :', error);
-            alert('Une erreur est survenue lors du blocage.');
-          }
-        );
-      });
-      alert('Utilisateurs bloqués avec succès.');
-    }
+    selectedUsers.forEach(user => {
+      this.utilisateurService.blockUtilisateur(user.id).subscribe(
+        () => {
+          user.status = 'Bloqué';
+        },
+        (error) => {
+          console.error('Erreur lors du blocage des utilisateurs :', error);
+        }
+      );
+    });
+    document.getElementById('blockSelectedModal')?.click(); // Fermer le modal
   }
 
   // Sélectionner/désélectionner tous les utilisateurs

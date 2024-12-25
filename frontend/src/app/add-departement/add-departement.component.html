@@ -1,0 +1,103 @@
+<div class="container my-5">
+    <div class="card shadow-lg">
+      <div class="card-header bg-success text-white text-center">
+        <h3>Ajouter un département</h3>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="onSubmit()" #departementForm="ngForm">
+          <!-- Champ Nom -->
+          <div class="mb-3">
+            <label for="nom" class="form-label fw-bold">Nom du département :</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nom"
+              name="nom"
+              [(ngModel)]="departement.nom"
+              (input)="onNomChange()"
+              required
+            />
+            <div *ngIf="errorMessage" class="text-danger mt-1">
+              {{ errorMessage }}
+            </div>
+          </div>
+  
+          <!-- Champ Année de création -->
+          <div class="mb-3">
+            <label for="annee_creation" class="form-label fw-bold">Année de création :</label>
+            <input
+              type="date"
+              class="form-control"
+              id="annee_creation"
+              name="annee_creation"
+              [(ngModel)]="departement.annee_creation"
+              required
+            />
+          </div>
+  
+          <!-- Champ Description -->
+          <div class="mb-3">
+            <label for="description" class="form-label fw-bold">Description :</label>
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="3"
+              [(ngModel)]="departement.description"
+              required
+            ></textarea>
+          </div>
+  
+          <!-- Bouton Soumettre -->
+          <div class="d-grid">
+            <button
+              type="submit"
+              class="btn btn-success"
+              [disabled]="!departementForm.valid || errorMessage"
+            >
+              Ajouter le département
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer text-center text-muted">
+        Gestion des départements
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Bootstrap -->
+  <div
+    class="modal fade"
+    id="successModal"
+    tabindex="-1"
+    aria-labelledby="successModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="successModalLabel">Succès</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>Ajout du département réussi avec succès !</p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-dismiss="modal"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

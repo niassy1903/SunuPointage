@@ -13,9 +13,8 @@
         <div>
             <button class="btn btn-primary me-2" (click)="exportCSV()">CSV</button>
             <button class="btn btn-success me-2" (click)="addUser()">+</button>
-            <button class="btn btn-outline-danger me-2" (click)="deleteSelectedUsers()"><i class="fas fa-trash"></i></button>
-            <button class="btn btn-outline-warning me-2" (click)="blockSelectedUsers()"><i class="fas fa-lock"></i></button>
-            
+            <button class="btn btn-outline-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteSelectedModal"><i class="fas fa-trash"></i></button> <!--suppression multiple-->
+            <button class="btn btn-outline-warning me-2" data-bs-toggle="modal" data-bs-target="#blockSelectedModal"><i class="fas fa-lock"></i></button> <!--bloquage multiple-->
         </div>
     </div>
 
@@ -28,6 +27,9 @@
                 <th>Matricule</th>
                 <th>Email</th>
                 <th>Adresse</th>
+                <th>Département</th>
+                <th>Cohorte</th>
+                <th>Statut</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -37,39 +39,115 @@
                 <td>
                     <img [src]="user.photo" alt="User Photo" class="rounded-circle me-2" width="40" height="40">
                     {{ user.firstName }} {{ user.lastName }}<br>
-                    <small>{{ user.status }}</small>
+                    <small>{{ user.fonction }}</small>
                 </td>
                 <td>{{ user.matricule }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.address }}</td>
+                <td>{{ user.departement }}</td>
+                <td>{{ user.cohorte }}</td>
+                <td>{{ user.status }}</td>
                 <td>
                     <button class="btn btn-sm btn-outline-secondary" (click)="editUser(user)"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)"><i class="fas fa-trash"></i></button>
-                    <button class="btn btn-sm btn-outline-warning" (click)="blockUser(user)"><i class="fas fa-lock"></i></button>
-                    
+                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" (click)="setUserToDelete(user)"><i class="fas fa-trash"></i></button> <!--suppression unique-->
+                    <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#blockModal" (click)="setUserToBlock(user)"><i class="fas fa-lock"></i></button> <!--bloquage unique-->
                 </td>
             </tr>
         </tbody>
     </table>
 
-<!-- Pagination -->
-<div class="pagination-container d-flex justify-content-center">
-    <nav>
-      <ul class="pagination">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
-        </li>
-  
-        <li class="page-item" [class.active]="currentPage === (idx + 1)" *ngFor="let i of [].constructor(totalPages); let idx = index">
-          <a class="page-link" href="javascript:void(0)" (click)="changePage(idx + 1)">{{ idx + 1 }}</a>
-        </li>
-  
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-  
-  
+    <!-- Pagination -->
+    <div class="pagination-container d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
+                </li>
+
+                <li class="page-item" [class.active]="currentPage === (idx + 1)" *ngFor="let i of [].constructor(totalPages); let idx = index">
+                    <a class="page-link" href="javascript:void(0)" (click)="changePage(idx + 1)">{{ idx + 1 }}</a>
+                </li>
+
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Modal pour la suppression unique -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Suppression d'utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer {{ userToDelete?.firstName }} {{ userToDelete?.lastName }} ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" (click)="confirmDeleteUser()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour le blocage unique -->
+<div class="modal fade" id="blockModal" tabindex="-1" aria-labelledby="blockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="blockModalLabel">Blocage d'utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir bloquer {{ userToBlock?.firstName }} {{ userToBlock?.lastName }} ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-warning" (click)="confirmBlockUser()">Bloquer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour la suppression multiple -->
+<div class="modal fade" id="deleteSelectedModal" tabindex="-1" aria-labelledby="deleteSelectedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteSelectedModalLabel">Suppression des utilisateurs sélectionnés</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer les utilisateurs sélectionnés ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" (click)="confirmDeleteSelectedUsers()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour le blocage multiple -->
+<div class="modal fade" id="blockSelectedModal" tabindex="-1" aria-labelledby="blockSelectedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="blockSelectedModalLabel">Blocage des utilisateurs sélectionnés</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir bloquer les utilisateurs sélectionnés ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-warning" (click)="confirmBlockSelectedUsers()">Bloquer</button>
+            </div>
+        </div>
+    </div>
 </div>

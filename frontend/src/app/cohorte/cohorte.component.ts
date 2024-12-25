@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
-import { CohorteService } from '../cohorte.service';
+import { CohorteService } from '../cohorte.service'; // Service des cohortes
+import { UtilisateurService } from '../utilisateur.service'; // Service des utilisateurs
 
 interface Cohorte {
   name: string;
   description: string;
-  capacity: number; // Données fictives pour l'instant
+  capacity: number; // La capacité sera calculée à partir de l'API
 }
 
 @Component({
@@ -18,7 +19,7 @@ interface Cohorte {
   styleUrls: ['./cohorte.component.css'],
   standalone: true,
   imports: [FormsModule, CommonModule, SidebarComponent, NavbarComponent, HttpClientModule],
-  providers: [CohorteService],
+  providers: [CohorteService, UtilisateurService], // Ajouter les deux services ici
 })
 export class CohorteComponent implements OnInit {
   cohortes: Cohorte[] = [];
@@ -26,27 +27,51 @@ export class CohorteComponent implements OnInit {
   itemsPerPage: number = 8;
   totalPages: number = 1;
 
-  constructor(private cohorteService: CohorteService) {}
+  constructor(
+    private cohorteService: CohorteService, // Service des cohortes
+    private utilisateurService: UtilisateurService // Service des utilisateurs
+  ) {}
 
   ngOnInit() {
     this.loadCohortes();
   }
 
-  loadCohortes() {
-    this.cohorteService.getCohortes().subscribe({
-      next: (data) => {
-        this.cohortes = data.map((cohorte) => ({
-          name: cohorte.nom,
-          description: cohorte.description,
-          capacity: 0, // Valeur fictive
-        }));
+ loadCohortes() {
+  this.cohorteService.getCohortes().subscribe({
+    next: (data) => {
+      // Créer un tableau de promesses pour les appels API
+      const promises = data.map(cohorte => 
+        new Promise<Cohorte>(resolve => {
+          this.utilisateurService.getApprenantsByCohorte(cohorte.nom).subscribe({
+            next: (apprenantsData) => {
+              resolve({
+                name: cohorte.nom,
+                description: cohorte.description,
+                capacity: apprenantsData.nombre_apprenants
+              });
+            },
+            error: () => {
+              resolve({
+                name: cohorte.name,
+                description: cohorte.description,
+                capacity: 0
+              });
+            }
+          });
+        })
+      );
+
+      // Attendre que toutes les promesses soient résolues
+      Promise.all(promises).then(cohortes => {
+        this.cohortes = cohortes;
         this.totalPages = Math.ceil(this.cohortes.length / this.itemsPerPage);
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des cohortes :', err);
-      },
-    });
-  }
+      });
+    },
+    error: (err) => {
+      console.error('Erreur:', err);
+    }
+  });
+}
 
   changePage(page: number) {
     if (page < 1 || page > this.totalPages) return;

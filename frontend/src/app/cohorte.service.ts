@@ -6,11 +6,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CohorteService {
-  private apiUrl = 'http://127.0.0.1:8000/api/cohortes';
+  private apiUrl1 = 'http://127.0.0.1:8000/api/cohortes';
 
   constructor(private http: HttpClient) { }
 
   getCohortes(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    return this.http.get<any[]>(this.apiUrl1);
   }
 }

@@ -11,6 +11,8 @@ export class UtilisateurService {
   private apiUrl = 'http://127.0.0.1:8000/api/utilisateurs';
 
   private apiUrl1 = 'http://127.0.0.1:8000/api';
+
+  private apiUrl2 = 'http://127.0.0.1:8000/api/telephones';
   
 
  
@@ -30,13 +32,15 @@ export class UtilisateurService {
   );
 }
 
-getUtilisateursByDepartment(departmentId: string): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl1}/departements/${departmentId}`);
+getUtilisateursByDepartmentAndFunction(departmentName: string, functionType: string): Observable<any> {
+  return this.http.get(`${this.apiUrl1}/employers/${encodeURIComponent(departmentName)}`);
 }
 
-getUtilisateursByDepartmentAndFunction(departmentId: string, functionName: string): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl1}/departements/${departmentId}/function/${functionName}`);
+getApprenantsByCohorte(cohorte: string): Observable<any> {
+  const encodedCohorte = encodeURIComponent(cohorte);
+  return this.http.get<any>(`${this.apiUrl1}/utilisateurs/apprenants-par-cohorte/${encodedCohorte}`);
 }
+
   redirectBasedOnRole(utilisateur: any) {
     if (utilisateur.fonction === 'admin') {
       this.router.navigate(['/dashboard']);
@@ -63,5 +67,13 @@ getUtilisateursByDepartmentAndFunction(departmentId: string, functionName: strin
 
   blockUtilisateur(id: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/${id}/bloquer`, {});
+  }
+
+  getUtilisateurById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+
+  checkTelephoneExists(telephone: string): Observable<{ exists: boolean }> {
+    return this.http.get<{ exists: boolean }>(`${this.apiUrl2}/${telephone}`);
   }
 }

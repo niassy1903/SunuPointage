@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { DepartementService } from '../departement.service';
 import { CohorteService } from '../cohorte.service';
-import { UtilisateurService } from '../utilisateur.service';
+import { UtilisateurService } from '../utilisateur.service'; // Importez le service
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { debounceTime, switchMap } from 'rxjs/operators';
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-inscription',
@@ -16,7 +19,7 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./inscription.component.css'],
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, SidebarComponent, NavbarComponent, HttpClientModule, FormsModule, RouterModule],
-  providers: [UtilisateurService, DepartementService, CohorteService]
+  providers: [UtilisateurService, DepartementService, CohorteService] // Ajoutez le service ici
 })
 export class InscriptionComponent implements OnInit {
   inscriptionForm: FormGroup;
@@ -24,27 +27,45 @@ export class InscriptionComponent implements OnInit {
   showNextStep: boolean = false;
   departements: any[] = [];
   cohortes: any[] = [];
+  passwordStrength: string = '';
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+  telephoneExists: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private departementService: DepartementService,
     private cohorteService: CohorteService,
-    private utilisateurService: UtilisateurService,
+    private utilisateurService: UtilisateurService, // Injectez le service ici
     private router: Router
   ) {
     this.inscriptionForm = this.fb.group({
-      nom: ['', Validators.required],
-      prenom: ['', Validators.required],
+      nom: ['', [Validators.required, Validators.pattern('^[a-zA-Zà-üÀ-Ü ]+$')]],
+      prenom: ['', [Validators.required, Validators.pattern('^[a-zA-Zà-üÀ-Ü ]+$')]],
       email: ['', [Validators.required, Validators.email]],
       adresse: ['', Validators.required],
-      telephone: ['', Validators.required],
+      telephone: ['', [Validators.required, this.telephoneValidator()]],
       fonction: ['', Validators.required],
       photo: [''],
       departement: [''],
       cohorte: [''],
-      mot_de_passe: ['', [Validators.minLength(6)]],
-      confirm_mot_de_passe: ['', [Validators.minLength(6)]],
+      mot_de_passe: ['', [Validators.minLength(6), this.passwordStrengthValidator()]],
+      confirm_mot_de_passe: ['', [Validators.minLength(6)]]
     }, { validator: this.passwordMatchValidator });
+
+    this.inscriptionForm.get('telephone')?.valueChanges
+      .pipe(
+        debounceTime(300),
+        switchMap(value => this.utilisateurService.checkTelephoneExists(value))
+      )
+      .subscribe(response => {
+        this.telephoneExists = response.exists;
+        if (response.exists) {
+          this.inscriptionForm.get('telephone')?.setErrors({ telephoneExists: true });
+        } else {
+          this.inscriptionForm.get('telephone')?.setErrors(null);
+        }
+      });
   }
 
   ngOnInit() {
@@ -62,16 +83,81 @@ export class InscriptionComponent implements OnInit {
     }
   }
 
+  telephoneValidator() {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const telephonePattern = /^(70|77|75|76|78)\d{7}$/;
+      const valid = telephonePattern.test(control.value);
+      return valid ? null : { invalidTelephone: { valid } };
+    };
+  }
+
+  passwordStrengthValidator() {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = control.value;
+      let strength = 'Mauvais';
+      if (value) {
+        if (value.length >= 8) {
+          strength = 'Bon';
+          if (/[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value)) {
+            strength = 'Fort';
+          } else if (/[A-Z]/.test(value) || /[a-z]/.test(value) || /\d/.test(value)) {
+            strength = 'Moyen';
+          }
+        }
+      }
+      this.passwordStrength = strength;
+      return null;
+    };
+  }
+
   passwordMatchValidator(formGroup: FormGroup) {
-    return formGroup.get('mot_de_passe')?.value === formGroup.get('confirm_mot_de_passe')?.value
-      ? null
-      : { mismatch: true };
+    const motDePasse = formGroup.get('mot_de_passe')?.value;
+    const confirmMotDePasse = formGroup.get('confirm_mot_de_passe')?.value;
+
+    if (motDePasse && confirmMotDePasse && motDePasse !== confirmMotDePasse) {
+      formGroup.get('confirm_mot_de_passe')?.setErrors({ notMatch: true });
+    } else {
+      formGroup.get('confirm_mot_de_passe')?.setErrors(null);
+    }
+  }
+
+  getPasswordStrengthWidth(): number {
+    switch (this.passwordStrength) {
+      case 'Mauvais':
+        return 25;
+      case 'Moyen':
+        return 50;
+      case 'Bon':
+        return 75;
+      case 'Fort':
+        return 100;
+      default:
+        return 0;
+    }
   }
 
   onFonctionChange() {
     const fonctionControl = this.inscriptionForm.get('fonction');
     if (fonctionControl) {
       this.fonction = fonctionControl.value;
+      this.updatePasswordControls();
+    }
+  }
+
+  updatePasswordControls() {
+    const motDePasseControl = this.inscriptionForm.get('mot_de_passe');
+    const confirmMotDePasseControl = this.inscriptionForm.get('confirm_mot_de_passe');
+
+    if (this.fonction === 'apprenant' || this.fonction === 'employer') {
+      motDePasseControl?.clearValidators();
+      motDePasseControl?.updateValueAndValidity();
+      confirmMotDePasseControl?.clearValidators();
+      confirmMotDePasseControl?.updateValueAndValidity();
+    } else {
+      motDePasseControl?.setValidators([Validators.minLength(6), this.passwordStrengthValidator()]);
+      motDePasseControl?.updateValueAndValidity();
+      confirmMotDePasseControl?.setValidators([Validators.minLength(6)]);
+      confirmMotDePasseControl?.updateValueAndValidity();
     }
   }
 
@@ -82,20 +168,34 @@ export class InscriptionComponent implements OnInit {
   onSubmit() {
     if (this.inscriptionForm.valid) {
       const formData = this.inscriptionForm.value;
-      // Ensure the password fields are included in the form data
       formData.mot_de_passe = formData.mot_de_passe || '';
       formData.confirm_mot_de_passe = formData.confirm_mot_de_passe || '';
 
       this.utilisateurService.createUtilisateur(formData).subscribe(
         response => {
           console.log('Utilisateur créé avec succès', response);
-          // Redirection vers la page des utilisateurs
-          this.router.navigate(['/utilisateur']);  // Remplacez '/utilisateurs' par le chemin correct vers la page des utilisateurs
+
+          // Afficher le modal de succès
+          const successModal = new bootstrap.Modal(document.getElementById('successModal')!);
+          successModal.show();
+
+          // Rediriger après quelques secondes (optionnel)
+          setTimeout(() => {
+            this.router.navigate(['/utilisateur']); // Remplacez '/utilisateur' par la route correcte
+          }, 10000);
         },
         error => {
           console.error('Erreur lors de la création de l\'utilisateur', error);
         }
       );
     }
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 }
