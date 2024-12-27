@@ -1,0 +1,172 @@
+<!-- dashboard.component.html -->
+
+<app-sidebar></app-sidebar>
+<app-navbar></app-navbar>
+
+<div class="container py-4">
+    <!-- Section Date et Heure -->
+    <div class="container py-4">
+        <div class="row text-center align-items-center">
+            <!-- Date et Heure -->
+            <div class="col-md-3 mb-3">
+            <div class="card shadow-sm d-flex border-0 h-100 text-center py-3">
+                <div>
+                    <i class="bi bi-brightness-alt-high-fill text-secondary fs-1"></i> <!-- Icône Soleil -->
+                </div>
+                <div>
+                    <h3 class="text-secondary mb-0">8:02:09 AM</h3>
+                    <p class="text-muted">2 août 2023</p>
+                </div>
+            </div>
+            </div>
+        
+            <!-- Carte 1 : Total Pointées -->
+            <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 text-center py-3">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                <h3 class="text-dark mb-0 me-2">70</h3>
+                <span class="rounded-circle bg-light p-2">
+                    <i class="bi bi-people-fill text-success fs-5"></i> <!-- Icône Groupe -->
+                </span>
+                </div>
+                <p class="fw-bold mb-1 text-dark">Total Pointées</p>
+                <small class="text-success">
+                <i class="bi bi-plus-circle me-1"></i>2 nouveaux employés !
+                </small>
+            </div>
+            </div>
+        
+            <!-- Carte 2 : Total Validation -->
+            <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 text-center py-3">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                <h3 class="text-dark mb-0 me-2">60</h3>
+                <span class="rounded-circle bg-light p-2">
+                    <i class="bi bi-check-circle-fill text-success fs-5"></i> <!-- Icône Validation -->
+                </span>
+                </div>
+                <p class="fw-bold mb-1 text-dark">Total Validation</p>
+                <small class="text-muted">
+                <i class="bi bi-dash-circle me-1"></i>-10% Moins qu’hier
+                </small>
+            </div>
+            </div>
+        
+            <!-- Carte 3 : Total Rejetée -->
+            <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100 text-center py-3">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                <h3 class="text-dark mb-0 me-2">10</h3>
+                <span class="rounded-circle bg-light p-2">
+                    <i class="bi bi-x-circle-fill text-danger fs-5"></i> <!-- Icône Rejet -->
+                </span>
+                </div>
+                <p class="fw-bold mb-1 text-dark">Total Rejetée</p>
+                <small class="text-danger">
+                <i class="bi bi-plus-circle me-1"></i>+3% Augmentation par rapport à hier
+                </small>
+            </div>
+            </div>
+        </div>
+    </div>      
+    
+    <!-- Processus Validation Utilisateurs -->
+    <div class="row text-center">
+        <div class="col-12">
+            <h4 class="fw-bold">Processus Validation Utilisateurs</h4>
+        </div>
+    </div>
+    
+    <!-- Image et message -->
+    <div class="row justify-content-center my-4">
+        <div class="col-md-6 text-center">
+            <img
+            src="assets/images/validation-image.png"
+            alt="Validation Illustration"
+            class="img-fluid mb-3"
+            />
+            <p class="text-warning fw-bold fs-5">Ooops!</p>
+            <p class="text-muted">
+            Veuillez attendre les informations d’une carte disponible pour valider
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Section Informations Utilisateur Scanner -->
+<div class="container mt-5">
+    <div class="row justify-content-center align-items-center ">
+      <!-- Section Image -->
+      <div class="col-md-6 text-center">
+        <div
+          class="PrevieweImg border border-dashed p-3 d-flex justify-content-center align-items-center"
+        >
+          <span>Image Preview</span>
+        </div>
+      </div>
+  
+      <!-- Section Formulaire -->
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <form (ngSubmit)="onSubmit()">
+              <div class="form-group mb-3">
+                <label for="name">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  class="form-control"
+                  [(ngModel)]="formData.name"
+                  name="name"
+                  required
+                />
+              </div>
+  
+              <div class="form-group mb-3">
+                <label for="prenom">Prénom</label>
+                <input
+                  type="text"
+                  id="prenom"
+                  class="form-control"
+                  [(ngModel)]="formData.prenom"
+                  name="prenom"
+                  required
+                />
+              </div>
+  
+              <div class="form-group mb-3">
+                <label for="role">Role</label>
+                <input
+                  type="text"
+                  id="role"
+                  class="form-control"
+                  [(ngModel)]="formData.role"
+                  name="role"
+                  required
+                />
+              </div>
+  
+              <div class="form-group mb-3">
+                <label for="cardId">CARD ID</label>
+                <input
+                  type="text"
+                  id="cardId"
+                  class="form-control"
+                  [(ngModel)]="formData.cardId"
+                  name="cardId"
+                  required
+                />
+              </div>
+  
+              
+            </form>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Validation</button>
+            <button type="button" class="btn btn-danger" (click)="onReject()">Rejeter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
