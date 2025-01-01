@@ -8,6 +8,8 @@ import { UtilisateurService } from '../utilisateur.service'; // Importation du s
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { DepartementService } from '../departement.service';
 import { CohorteService } from '../cohorte.service';
+import * as Papa from 'papaparse'; // Importation de PapaParse pour lire le CSV
+
 
 interface User {
   id: string;
@@ -144,7 +146,7 @@ export class UtilisateurComponent implements OnInit {
     if (this.userToBlock !== null) { // Vérifie si userToBlock n'est pas null
       this.utilisateurService.blockUtilisateur(this.userToBlock.id).subscribe(
         () => {
-          // Assurez-vous de ne pas obtenir une erreur en accédant à `userToBlock`
+          // Assurez-vous de ne pas obtenir une erreur en accédant à userToBlock
           if (this.userToBlock) {
             this.userToBlock.status = 'Bloqué';
           }
@@ -159,7 +161,7 @@ export class UtilisateurComponent implements OnInit {
       console.error('L\'utilisateur à bloquer est introuvable.');
     }
   }
-  
+
   // Suppression des utilisateurs sélectionnés
   confirmDeleteSelectedUsers() {
     const selectedUsers = this.filteredUsers.filter(user => user.selected);
@@ -217,8 +219,45 @@ export class UtilisateurComponent implements OnInit {
     this.selectedUsersCount = this.filteredUsers.filter(user => user.selected).length;
   }
 
-  // Exporter les utilisateurs en CSV
-  exportCSV() {
-    // Logique pour exporter les utilisateurs en CSV
+  // Méthode pour déclencher l'ouverture du sélecteur de fichiers
+  triggerFileUpload() {
+    const fileInput = document.getElementById('csvFileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+
+  // Méthode pour gérer la sélection du fichier
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.readCSVFile(file);
+    }
+  }
+
+  // Méthode pour lire et traiter le fichier CSV
+  readCSVFile(file: File) {
+    Papa.parse(file, {
+      header: true,
+      complete: (results) => {
+        const usersFromCSV = results.data as User[];
+        usersFromCSV.forEach(user => {
+          this.utilisateurService.createUtilisateur(user).subscribe(
+            (response) => {
+              console.log('Utilisateur créé avec succès:', response);
+              this.users.push(response);
+              this.updatePagination();
+            },
+            (error) => {
+              console.error('Erreur lors de la création de l\'utilisateur :', error);
+            }
+          );
+        });
+      },
+      error: (error) => {
+        console.error('Erreur lors de la lecture du fichier CSV:', error);
+      }
+    });
   }
 }

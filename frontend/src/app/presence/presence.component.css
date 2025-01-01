@@ -36,7 +36,8 @@
 
 /* Style pour l'en-tête du tableau */
 thead {
-  background-color: #f1f3f5;
+  background-color: #28a745; /* Vert */
+  color: #28a745; /* Texte en blanc */
   text-align: left;
   font-weight: bold;
   border-bottom: 2px solid #dee2e6;
@@ -47,6 +48,8 @@ th, td {
   border-bottom: 1px solid #dee2e6;
 }
 
+
+
 /* Style pour les liens de pagination */
 .page-link {
   color: #007bff;
@@ -54,10 +57,6 @@ th, td {
   text-decoration: none;
 }
 
-.page-link:hover {
-  color: #0056b3;
-  text-decoration: underline;
-}
 
 /* Bordure et style pour le container de la date */
 .date-container {
@@ -77,9 +76,7 @@ th, td {
   margin-left: 5px;
 }
 
-.date-button:hover {
-  color: #0056b3;
-}
+
 
 /* Texte pour la date */
 .current-date {
@@ -106,10 +103,7 @@ th, td {
   font-size: 1.1rem;
 }
 
-.btn-success:hover {
-  background-color: #218838;
-  border-color: #1e7e34;
-}
+
 
 /* Style des badges de statut */
 .status-badge {
@@ -169,35 +163,35 @@ button, .btn {
     
   }
 }
-/* Statut "Ponctuelle" (bleu clair) */
-.badge-ponctuelle {
-  background-color: #e6f3ff;
-  color: #007bff;  /* Texte bleu */
-  border: 2px solid #007bff;  /* Bordure bleue */
-}
 
-/* Statut "Absent" (rouge clair) */
+/* Badge de statut */
 .badge-absent {
-  background-color: #ffe5e5;
-  color: #dc3545;  /* Texte rouge */
-  border: 2px solid #dc3545;  /* Bordure rouge */
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
 }
 
-/* Statut "Retard" (jaune clair) */
+.badge-malade {
+  background-color: orange;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.badge-conge {
+  background-color: green;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
 .badge-retard {
-  background-color: #fff7e6;
-  color: #ffc107;  /* Texte jaune */
-  border: 2px solid #ffc107;  /* Bordure jaune */
+  background-color: yellow;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 5px;
 }
-
-/* Statut "Travail à distance" (gris clair) */
-.badge-telework {
-  background-color: #f5f5f5;
-  color: #6c757d;  /* Texte gris */
-  border: 2px solid #6c757d;  /* Bordure grise */
-}
-
-
 
 .date-button {
   background: transparent;
@@ -207,6 +201,17 @@ button, .btn {
   margin-left: 5px;
 }
 
-.date-button:hover {
-  color: #0056b3;
+/* Supprime les styles des badges inutilisés */
+.badge {
+  display: none;
+}
+
+/* Ajuste les styles globaux pour un tableau clair */
+.table td {
+  font-size: 1rem;
+  text-align: center;
+}
+
+.table th {
+  text-align: center;
 }

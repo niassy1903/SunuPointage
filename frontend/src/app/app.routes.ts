@@ -11,6 +11,7 @@ import { HistoriqueComponent } from './historique/historique.component';
 import { InscriptionComponent } from './inscription/inscription.component';
 import { EditComponent } from './edit/edit.component';
 import { AddDepartementComponent } from './add-departement/add-departement.component';
+import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
 
 
 
@@ -30,6 +31,7 @@ export const routes: Routes = [
     {path: 'inscription',component:InscriptionComponent},
     { path: 'edit/:id', component: EditComponent },
     {path:'add-departement', component: AddDepartementComponent},
+    {path:'dashboard-vigile', component: DashboardVigileComponent},
 
 
 ];

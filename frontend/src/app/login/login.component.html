@@ -3,7 +3,7 @@
   <!-- Contenu principal (Formulaire) -->
   <div class="login-container">
     <div class="logo">
-      <img src="assets/logo.png" alt="Logo" />
+      <img src="/images/logo.png" alt="Logo" />
     </div>
 
     <h2>Connectez-vous à votre compte.</h2>
@@ -11,55 +11,75 @@
       Scannez votre carte pour accéder facilement au système et à la plateforme !
     </p>
 
-    <form (submit)="onSubmit()">
-      <!-- Champ Email -->
-      <div class="form-group">
-        <label for="email">Adresse e-mail</label>
-        <div class="input-container">
-          <i class="fas fa-envelope"></i>
-          <input
-            type="email"
-            id="email"
-            placeholder="Entrer votre adresse email"
-            [(ngModel)]="email"
-            name="email"
-            required
-          />
+    <div *ngIf="!showCardInput">
+      <form (submit)="onSubmit()">
+        <!-- Champ Email -->
+        <div class="form-group">
+          <label for="email">Adresse e-mail</label>
+          <div class="input-container">
+            <i class="bi bi-envelope"></i>
+            <input
+              type="email"
+              id="email"
+              placeholder="Entrer votre adresse email"
+              [(ngModel)]="email"
+              name="email"
+              required
+            />
+          </div>
         </div>
-      </div>
 
-      <!-- Champ Mot de passe -->
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <div class="input-container">
-          <i class="fas fa-lock"></i>
-          <input
-            type="password"
-            id="password"
-            placeholder="Entrer votre mot de passe"
-            [(ngModel)]="password"
-            name="password"
-            required
-          />
-          <i class="fas fa-eye" (click)="togglePassword()"></i>
+        <!-- Champ Mot de passe -->
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <div class="input-container">
+            <i class="bi bi-lock"></i>
+            <input
+              type="password"
+              id="password"
+              placeholder="Entrer votre mot de passe"
+              [(ngModel)]="password"
+              name="password"
+              required
+            />
+            <i class="bi bi-eye" (click)="togglePassword()"></i>
+          </div>
+          <div *ngIf="errorMessage === 'Accès non autorisé'" class="error-message">
+            Accès non autorisé
+          </div>
         </div>
-      </div>
 
-      <!-- Message d'erreur -->
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
+        <!-- Message d'erreur -->
+        <div *ngIf="errorMessage && errorMessage !== 'Accès non autorisé'" class="error-message">
+          {{ errorMessage }}
+        </div>
 
-      <!-- Message de succès -->
-      <div *ngIf="successMessage" class="success-message">
-        {{ successMessage }}
-      </div>
+        <!-- Message de succès -->
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
 
-      <!-- Bouton de connexion -->
-      <button type="submit" class="btn-login">
-        Se connecter <i class="fas fa-arrow-right"></i>
-      </button>
-    </form>
+        <!-- Bouton de connexion -->
+        <button type="submit" class="btn-login">
+          Se connecter <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+
+    <div *ngIf="showCardInput" class="card-input-container">
+      <label for="cardId">Scannez votre carte</label>
+      <div class="input-container">
+        <i class="bi bi-credit-card"></i>
+        <input
+          type="text"
+          id="cardId"
+          placeholder="Scannez votre carte"
+          [(ngModel)]="cardId"
+          name="cardId"
+          readonly
+        />
+      </div>
+    </div>
   </div>
 
   <!-- Pied de page -->
@@ -68,4 +88,40 @@
     <a href="#">Politique de confidentialité</a>
     <a href="#">Conditions d'utilisation</a>
   </footer>
+</div>
+
+<!-- Modal Bootstrap pour la connexion réussie -->
+<div class="modal fade" id="loginSuccessModal" tabindex="-1" aria-labelledby="loginSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content custom-modal">
+      <div class="modal-header">
+        <h5 class="modal-title text-success" id="loginSuccessModalLabel">Connexion Réussie</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bonjour ! Connexion réussie avec succès.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-modal-ok" id="confirmRedirect" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Bootstrap pour l'accès non autorisé -->
+<div class="modal fade" id="unauthorizedModal" tabindex="-1" aria-labelledby="unauthorizedModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content custom-modal">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="unauthorizedModalLabel">Accès Non Autorisé</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Vous n'êtes pas autorisé à vous connecter avec une carte.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-modal-ok" id="confirmRedirectUnauthorized" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
 </div>

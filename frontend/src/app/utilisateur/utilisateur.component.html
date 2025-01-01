@@ -11,10 +11,11 @@
             <span class="ms-2">{{ selectedUsersCount }} Selected</span>
         </div>
         <div>
-            <button class="btn btn-primary me-2" (click)="exportCSV()">CSV</button>
+            <button class="btn btn-primary me-2" (click)="triggerFileUpload()">CSV</button>
             <button class="btn btn-success me-2" (click)="addUser()">+</button>
             <button class="btn btn-outline-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteSelectedModal"><i class="fas fa-trash"></i></button> <!--suppression multiple-->
             <button class="btn btn-outline-warning me-2" data-bs-toggle="modal" data-bs-target="#blockSelectedModal"><i class="fas fa-lock"></i></button> <!--bloquage multiple-->
+            <input type="file" id="csvFileInput" class="form-control me-2" (change)="onFileSelected($event)" accept=".csv" style="display: none;">
         </div>
     </div>
 

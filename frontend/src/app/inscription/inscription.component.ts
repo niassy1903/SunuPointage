@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { DepartementService } from '../departement.service';
 import { CohorteService } from '../cohorte.service';
-import { UtilisateurService } from '../utilisateur.service'; // Importez le service
+import { UtilisateurService } from '../utilisateur.service';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { debounceTime, switchMap } from 'rxjs/operators';
+
 
 declare var bootstrap: any;
 
@@ -19,9 +20,9 @@ declare var bootstrap: any;
   styleUrls: ['./inscription.component.css'],
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, SidebarComponent, NavbarComponent, HttpClientModule, FormsModule, RouterModule],
-  providers: [UtilisateurService, DepartementService, CohorteService] // Ajoutez le service ici
+  providers: [UtilisateurService, DepartementService, CohorteService]
 })
-export class InscriptionComponent implements OnInit {
+export class InscriptionComponent implements OnInit, OnDestroy {
   inscriptionForm: FormGroup;
   fonction: string = '';
   showNextStep: boolean = false;
@@ -31,12 +32,16 @@ export class InscriptionComponent implements OnInit {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   telephoneExists: boolean = false;
+  cardIdExists: boolean = false;
+  ws: WebSocket;
+  isAssigningCard: boolean = false; // Ajout de cette propriété
+  scannedCardId: string = ''; // Ajout de cette variable pour stocker le cardId scanné
 
   constructor(
     private fb: FormBuilder,
     private departementService: DepartementService,
     private cohorteService: CohorteService,
-    private utilisateurService: UtilisateurService, // Injectez le service ici
+    private utilisateurService: UtilisateurService,
     private router: Router
   ) {
     this.inscriptionForm = this.fb.group({
@@ -50,7 +55,8 @@ export class InscriptionComponent implements OnInit {
       departement: [''],
       cohorte: [''],
       mot_de_passe: ['', [Validators.minLength(6), this.passwordStrengthValidator()]],
-      confirm_mot_de_passe: ['', [Validators.minLength(6)]]
+      confirm_mot_de_passe: ['', [Validators.minLength(6)]],
+      card_id: ['', Validators.required] // Ajout du champ card_id
     }, { validator: this.passwordMatchValidator });
 
     this.inscriptionForm.get('telephone')?.valueChanges
@@ -66,6 +72,9 @@ export class InscriptionComponent implements OnInit {
           this.inscriptionForm.get('telephone')?.setErrors(null);
         }
       });
+
+    // Initialize WebSocket connection
+    this.ws = new WebSocket('ws://localhost:8080');
   }
 
   ngOnInit() {
@@ -80,6 +89,25 @@ export class InscriptionComponent implements OnInit {
     const fonctionControl = this.inscriptionForm.get('fonction');
     if (fonctionControl) {
       this.fonction = fonctionControl.value;
+    }
+
+    // Se connecter au serveur WebSocket
+    this.ws = new WebSocket('ws://localhost:8080');
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'cardRead') {
+        this.scannedCardId = data.cardId; // Stocker le cardId scanné
+        this.inscriptionForm.get('card_id')?.setValue(this.scannedCardId);
+        this.checkCardIdExists(this.scannedCardId);
+      }
+    };
+  }
+
+  ngOnDestroy() {
+    // Fermer la connexion WebSocket
+    if (this.ws) {
+      this.ws.close();
     }
   }
 
@@ -197,5 +225,26 @@ export class InscriptionComponent implements OnInit {
 
   toggleConfirmPasswordVisibility() {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  checkCardIdExists(cardId: string) {
+    this.utilisateurService.checkCardIdExists(cardId).subscribe(
+      response => {
+        this.cardIdExists = response.exists;
+        if (response.exists) {
+          this.inscriptionForm.get('card_id')?.setErrors({ cardIdExists: true });
+        } else {
+          this.inscriptionForm.get('card_id')?.setErrors(null);
+        }
+      },
+      error => {
+        console.error('Erreur lors de la vérification de la carte', error);
+      }
+    );
+  }
+
+  scanCard() {
+    this.isAssigningCard = true;
+    this.ws.send(JSON.stringify({ type: 'scanCard' }));
   }
 }

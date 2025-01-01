@@ -23,11 +23,11 @@
   padding: 2rem;
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 6px #8DBB36;
 }
 
 .logo img {
-  max-width: 100px;
+  max-width: 90px;
   margin-bottom: 1rem;
 }
 
@@ -121,4 +121,123 @@ input {
 .success-message {
   color: green;
   margin-bottom: 1rem;
+}
+
+/* Champ de saisie de la carte */
+.card-input-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.card-input-container label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #333;
+}
+
+.card-input-container input {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+  margin: auto;
+}
+
+
+
+/* Style personnalisé pour le modal */
+.custom-modal {
+  background-color: #e6ffe6; /* Vert pâle */
+  border: 2px solid #84c34e; /* Bordure verte */
+  border-radius: 10px; /* Coins arrondis */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background-color: #84c34e; /* Vert */
+  color: white;
+  border-bottom: 2px solid #6ba838;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.modal-body {
+  color: #333;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.modal-footer {
+  border-top: none;
+  justify-content: center;
+}
+
+.btn-modal-ok {
+  background-color: #6ba838;
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem 2rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-modal-ok:hover {
+  background-color: #5a8f30;
+}
+
+.modal-dialog {
+  position: fixed;
+  top: 20%; /* Positionne le modal en haut */
+  left: 50%; /* Centrage horizontal */
+
+  transform: translate(-50%, -20%); /* Ajuste la position pour être exactement au centre horizontalement */
+  max-width: 400px; /* Largeur maximale pour éviter les débordements */
+  width: 100%; /* S'assure qu'il est réactif */
+  background-color: white; /* Couleur de fond du modal */
+  border-radius: 10px; /* Arrondir les coins */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Ombre pour un effet élégant */
+  z-index: 1050; /* Assure qu'il est bien au-dessus des autres éléments */
+}
+
+/* Styles pour les modals */
+.custom-modal .modal-header {
+  background-color: #8DBB36;
+  color: white;
+}
+
+.custom-modal .modal-title {
+  color: white;
+}
+
+.custom-modal .btn-close {
+  color: white;
+}
+
+.custom-modal .btn-modal-ok {
+  background-color: #8DBB36;
+  border: none;
+}
+
+.custom-modal .btn-modal-ok:hover {
+  background-color: #7bb12e;
+}
+
+.hidden {
+  display: none;
+}
+
+.logo img {
+  max-width: 350px; /* Augmente la taille du logo */
+  height: auto; /* Permet à l'image de garder ses proportions */
+ 
+  margin-bottom: 1rem;
+ 
 }

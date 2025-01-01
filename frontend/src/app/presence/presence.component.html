@@ -4,16 +4,15 @@
 <div class="container mt-5">
   <h2 class="mb-4 text-center">Aperçu des présences</h2>
 
-  <!-- Barre de recherche, calendrier et bouton Filtrer -->
   <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
     <input
       type="text"
       class="form-control w-50 mb-2"
       placeholder="Rechercher un employé..."
       [(ngModel)]="searchText"
+      (input)="filterPresences($event)"
     />
 
-         <!-- Date actuelle avec bordure et icône calendrier -->
     <div class="date-container d-flex align-items-center">
       <span class="current-date mr-2">{{ currentDate }}</span>
       <button class="btn date-button">
@@ -22,46 +21,63 @@
     </div>
 
     <button class="btn btn-success d-flex align-items-center mb-2">
-      <i class="bi bi-funnel-fill mr-2"></i> Filtres avancés
+      <i class="bi bi-funnel-fill mr-2"></i> Filtrer
+    </button>
+
+    <button class="btn btn-primary d-flex align-items-center mb-2" (click)="markAbsentUsers()">
+      <i class="bi bi-check-circle mr-2"></i> Valider multiple
     </button>
   </div>
 
-  <!-- Tableau des présences -->
   <div class="table-responsive">
     <table class="table table-bordered table-striped">
       <thead class="thead-dark">
         <tr>
-          <th>ID</th>
-          <th>Employé</th>
-          <th>Rôle</th>
-          <th>Département</th>
-          <th>Date</th>
+          <th>Card ID</th>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>Date actuelle</th>
           <th>Statut</th>
           <th>Arrivée</th>
           <th>Départ</th>
           <th>Temps de travail</th>
+          <th>Absent</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let presence of filteredPresences">
-          <td>{{ presence.id }}</td>
-          <td>{{ presence.employe }}</td>
-          <td>{{ presence.role }}</td>
-          <td>{{ presence.departement }}</td>
-          <td>{{ presence.date }}</td>
-          <td>
-            <span
-              class="badge"
-              [ngClass]="getStatusBadgeClass(presence.statut)"
-            >
-              {{ presence.statut }}
-            </span>
+          <td>{{ presence.card_id || '--' }}</td>
+          <td>{{ presence.nom || '--' }}</td>
+          <td>{{ presence.prenom || '--' }}</td>
+          <td>{{ presence.date_actuelle | date: 'dd/MM/yyyy' }}</td>
+          <td [ngStyle]="getStatutStyle(presence.statut)">
+            {{ presence.statut || 'Absent' }}
           </td>
-          <td>{{ presence.arrivee }}</td>
-          <td>{{ presence.depart }}</td>
-          <td>{{ presence.tempsTravail }}</td>
+          <td>{{ presence.heure_arrivee || '--' }}</td>
+          <td>{{ presence.heure_depart || '--' }}</td>
+          <td>{{ calculateWorkTime(presence.heure_arrivee, presence.heure_depart) || '--' }}</td>
+          <td>
+            <input type="checkbox" [(ngModel)]="presence.isChecked" [disabled]="presence.statut === 'present'" />
+          </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container d-flex justify-content-center">
+    <nav>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
+        </li>
+        <li class="page-item" [class.active]="currentPage === (idx + 1)" *ngFor="let i of [].constructor(getTotalPages()); let idx = index">
+          <a class="page-link" href="javascript:void(0)" (click)="changePage(idx + 1)">{{ idx + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+          <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
