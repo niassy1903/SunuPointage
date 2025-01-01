@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; // Ajoutez cette ligne
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UtilisateurController extends Controller
 {
@@ -12,6 +13,20 @@ class UtilisateurController extends Controller
     public function index()
     {
         return Utilisateur::all();
+    }
+
+    public function loginByCardId(Request $request)
+    {
+        Log::info('Card ID reçu : ' . $request->card_id);
+
+        // Recherche de l'utilisateur avec le card_id dans la collection MongoDB
+        $utilisateur = Utilisateur::where('card_id', $request->card_id)->first();
+
+        if (!$utilisateur) {
+            return response()->json(['message' => 'Carte ID non trouvée'], 404);
+        }
+
+        return response()->json(['message' => 'connexion réussie', 'utilisateur' => $utilisateur]);
     }
 
     public function login(Request $request)
@@ -27,14 +42,13 @@ class UtilisateurController extends Controller
             return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
         }
 
-        if (!in_array($utilisateur->fonction, ['admin', 'vigile'])) {
+        if (!in_array($utilisateur->fonction, ['admin','vigile'])) {
             return response()->json(['message' => 'Accès non autorisé'], 403);
         }
 
         return response()->json(['message' => 'Login successful', 'utilisateur' => $utilisateur]);
     }
 
-    // Créer un nouvel utilisateur
     public function store(Request $request)
     {
         try {
@@ -50,14 +64,21 @@ class UtilisateurController extends Controller
                 'cohorte' => 'nullable|string',
                 'mot_de_passe' => 'nullable|min:6|same:confirm_mot_de_passe',
                 'confirm_mot_de_passe' => 'nullable|min:6',
+                'card_id' => 'nullable|string', // Ajout du champ card_id
             ]);
+
+            // Vérification de l'unicité de card_id
+            $cardIdExists = Utilisateur::where('card_id', $request->card_id)->exists();
+            if ($cardIdExists) {
+                return response()->json(['message' => 'Card ID already exists'], 409);
+            }
 
             $matricule = $this->generateMatricule();
 
             $data = $request->all();
             $data['matricule'] = $matricule;
 
-            // Le mot de passe sera haché automatiquement par le setter dans le modèle
+            // Création de l'utilisateur
             $utilisateur = Utilisateur::create($data);
 
             return response()->json(['message' => 'Utilisateur créé avec succès.', 'utilisateur' => $utilisateur], 201);
@@ -100,6 +121,7 @@ class UtilisateurController extends Controller
             'cohorte' => 'nullable|string',
             'mot_de_passe' => 'nullable|min:6|same:confirm_mot_de_passe',
             'confirm_mot_de_passe' => 'nullable|min:6',
+            'card_id' => 'nullable|string', // Ajout du champ card_id
         ]);
 
         $data = $request->all();
@@ -146,30 +168,55 @@ class UtilisateurController extends Controller
         return $this->update($request, $id); // Réutilise la méthode "update"
     }
 
-        
     public function getEmployersByDepartment($departement)
     {
         $employers = Utilisateur::where('fonction', 'employer')
                                 ->where('departement', $departement)
                                 ->get();
-    
+
         if ($employers->isEmpty()) {
             return response()->json(['message' => 'Aucun employé trouvé pour ce département'], 404);
         }
-    
+
         return response()->json($employers, 200);
     }
-    
-    
-        // Méthode pour obtenir le nombre d'apprenants dans une cohorte spécifique
-        public function getApprenantsByCohorte($cohorte)
-        {
-            $apprenants = Utilisateur::where('fonction', 'apprenant')
-                                     ->where('cohorte', $cohorte)
-                                     ->count();
-    
-            return response()->json(['cohorte' => $cohorte, 'nombre_apprenants' => $apprenants], 200);
+
+    // Méthode pour obtenir le nombre d'apprenants dans une cohorte spécifique
+    public function getApprenantsByCohorte($cohorte)
+    {
+        $apprenants = Utilisateur::where('fonction', 'apprenant')
+                                 ->where('cohorte', $cohorte)
+                                 ->count();
+
+        return response()->json(['cohorte' => $cohorte, 'nombre_apprenants' => $apprenants], 200);
+    }
+
+    // Ajoutez cette méthode pour vérifier l'existence de la carte
+    public function checkCardIdExists($cardId)
+    {
+        $exists = Utilisateur::where('card_id', $cardId)->exists();
+        return response()->json(['exists' => $exists]);
+    }
+
+    // Ajoutez cette méthode pour assigner une carte à un utilisateur
+    public function assignCard(Request $request)
+    {
+        $request->validate([
+            'card_id' => 'required|string',
+        ]);
+
+        $utilisateur = Utilisateur::where('card_id', $request->card_id)->first();
+
+        if ($utilisateur) {
+            return response()->json(['message' => 'Carte ID déjà assignée'], 409);
         }
 
+        // Logique pour assigner la carte à un utilisateur
+        // Par exemple, vous pouvez mettre à jour l'utilisateur avec le card_id
+        $utilisateur = Utilisateur::find($request->user_id);
+        $utilisateur->card_id = $request->card_id;
+        $utilisateur->save();
 
+        return response()->json(['message' => 'Carte assignée avec succès'], 200);
+    }
 }

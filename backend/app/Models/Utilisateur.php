@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
@@ -29,6 +28,7 @@ class Utilisateur extends Model
         'cohorte',
         'matricule',
         'status', // Nouveau champ ajouté
+        'card_id', // Nouveau champ pour l'ID de la carte RFID
     ];
 
     // Cast des dates
