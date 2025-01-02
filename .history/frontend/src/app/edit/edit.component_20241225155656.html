@@ -1,0 +1,180 @@
+<app-sidebar></app-sidebar>
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header bg-success text-white">
+      <h2 class="text-center">Édition d'un Utilisateur</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+        <div class="form-group row">
+          <label for="nom" class="col-sm-2 col-form-label">Nom</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="nom" formControlName="nom">
+            <div *ngIf="editForm.get('nom')?.invalid && editForm.get('nom')?.touched" class="text-danger">
+              Nom est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="prenom" formControlName="prenom">
+            <div *ngIf="editForm.get('prenom')?.invalid && editForm.get('prenom')?.touched" class="text-danger">
+              Prénom est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="email" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control" id="email" formControlName="email">
+            <div *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched" class="text-danger">
+              Email est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="adresse" class="col-sm-2 col-form-label">Adresse</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="adresse" formControlName="adresse">
+            <div *ngIf="editForm.get('adresse')?.invalid && editForm.get('adresse')?.touched" class="text-danger">
+              Adresse est incorrecte.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="telephone" class="col-sm-2 col-form-label">Téléphone</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="telephone" formControlName="telephone">
+            <div *ngIf="editForm.get('telephone')?.invalid && editForm.get('telephone')?.touched" class="text-danger">
+              Téléphone est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="fonction" class="col-sm-2 col-form-label">Fonction</label>
+          <div class="col-sm-10">
+            <select class="form-control" id="fonction" formControlName="fonction" (change)="onFonctionChange()">
+              <option value="vigile">Vigile</option>
+              <option value="apprenant">Apprenant</option>
+              <option value="employer">Employer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div *ngIf="editForm.get('fonction')?.invalid && editForm.get('fonction')?.touched" class="text-danger">
+              Fonction est incorrecte.
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showNextStep">
+          <div *ngIf="fonction === 'vigile' || fonction === 'admin'">
+            <div class="form-group row">
+              <label for="ancien_mot_de_passe" class="col-sm-2 col-form-label">Ancien mot de passe</label>
+              <div class="col-sm-10">
+                <div class="input-group">
+                  <input [type]="showAncienPassword ? 'text' : 'password'" class="form-control" id="ancien_mot_de_passe" formControlName="ancien_mot_de_passe">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" (click)="toggleAncienPasswordVisibility()">
+                      <i class="fas" [ngClass]="{'fa-eye': !showAncienPassword, 'fa-eye-slash': showAncienPassword}"></i>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="editForm.get('ancien_mot_de_passe')?.invalid && editForm.get('ancien_mot_de_passe')?.touched" class="text-danger">
+                  Ancien mot de passe est incorrect.
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="mot_de_passe" class="col-sm-2 col-form-label">Nouveau mot de passe</label>
+              <div class="col-sm-10">
+                <div class="input-group">
+                  <input [type]="showNewPassword ? 'text' : 'password'" class="form-control" id="mot_de_passe" formControlName="mot_de_passe">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" (click)="toggleNewPasswordVisibility()">
+                      <i class="fas" [ngClass]="{'fa-eye': !showNewPassword, 'fa-eye-slash': showNewPassword}"></i>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="editForm.get('mot_de_passe')?.invalid && editForm.get('mot_de_passe')?.touched" class="text-danger">
+                  Nouveau mot de passe est incorrect.
+                </div>
+                <div class="mt-2">
+                  <span [ngClass]="{'text-danger': passwordStrength === 'Mauvais', 'text-warning': passwordStrength === 'Moyen', 'text-success': passwordStrength === 'Fort', 'text-info': passwordStrength === 'Bon'}">
+                    Force du mot de passe: {{ passwordStrength }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="fonction === 'apprenant'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="departement" class="col-sm-2 col-form-label">Département</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="departement" formControlName="departement">
+                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="cohorte" class="col-sm-2 col-form-label">Cohorte</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="cohorte" formControlName="cohorte">
+                  <option *ngFor="let cohorte of cohortes" [value]="cohorte.nom">{{ cohorte.nom }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="fonction === 'employer'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="departement" class="col-sm-2 col-form-label">Département</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="departement" formControlName="departement">
+                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-sm-10 offset-sm-2">
+            <button type="button" class="btn btn-primary" [disabled]="!editForm.valid" (click)="nextStep()">Suivant</button>
+            <button type="submit" class="btn btn-success" *ngIf="showNextStep">Soumettre</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal after successful submission -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateModalLabel">Mise à jour réussie</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        L'utilisateur a été mis à jour avec succès.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <button type="button" class="btn btn-primary" (click)="redirectToUtilisateur()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

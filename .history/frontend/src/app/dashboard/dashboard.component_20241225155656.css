@@ -1,0 +1,101 @@
+
+/* Contenu principal avec décalage */
+main {
+    margin-left: 100px;
+    padding: 20px;
+    overflow: hidden; /* Empêche les débordements */
+}
+
+/* Container de cartes */
+.container-fluid {
+    margin-top: 20px;
+}
+
+
+.card {
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #8DBB36; /* Vert pour les icônes des cartes */
+}
+
+.icon {
+    color: #c5e1a5;
+    font-size: 25px;
+}
+
+.text-green { color: #8DBB36; } /* Utilisation du vert pour le texte */
+      .text-red { color: #dc3545; }
+
+   
+/* Sidebar */
+.sidebar {
+    background-color: #FFFFFF; 
+    width: 80px;
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    z-index: 1000; /* S'assurer que la sidebar reste au-dessus */
+}
+
+/* Contenu principal avec décalage */
+main {
+    margin-left: 100px;
+    padding: 20px;
+    overflow: hidden;  /* Prévenir tout débordement */
+    height: 100vh;  /* Assurer que la hauteur est limitée à la hauteur de l'écran */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Graphiques */
+.graphs {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; /* Assurer que les graphiques ne débordent pas */
+    margin-top: 20px;
+}
+
+.graph {
+    background: white;
+    padding: 20px;
+    flex: 1;
+    max-width: 48%; /* Pour éviter les débordements horizontaux */
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 200px;  /* Ajouter une hauteur minimale pour éviter les changements de taille */
+}
+
+/* Carte (garder un contrôle sur les tailles) */
+.card {
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Eviter les débordements */
+}
+
+/* Responsivité - Assurer l'affichage correct à différentes tailles d'écran */
+@media (max-width: 768px) {
+    .graphs {
+        flex-direction: column;
+    }
+
+    .graph {
+        max-width: 100%;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+}

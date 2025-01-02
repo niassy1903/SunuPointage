@@ -1,0 +1,75 @@
+<!-- <div class="sidebar">
+    <div class="logo">
+        <i class="fas fa-chart-line" style="font-size: 24px;"></i>
+    </div>
+    <nav>
+        <ul>
+            <li>
+                <i class="fas fa-home" ></i>
+            </li>
+            <li>
+                <i class="fas fa-chart-line" ></i>
+            </li>
+            <li>
+                <i class="fas fa-users"></i>
+            </li>
+            <li>
+                <i class="fas fa-building"  ></i>
+            </li>
+            <li>
+                <i class="fas fa-layer-group" ></i>
+            </li>
+            <li>
+                <i class="fas fa-history" ></i>
+            </li>
+            <li>
+                <i class="fas fa-cogs" title="Paramètres"></i>
+            </li>
+        </ul>
+        
+    </nav>
+    <div class="logout">
+        <i class="fas fa-sign-out-alt" ></i>
+    </div>
+</div> -->
+
+<!-- Celle à changer -->
+<nav class="sidebar d-flex flex-column bg-white shadow-sm">
+    <div class="sidebar-content d-flex flex-column h-100">
+      <div class="p-3 text-center">
+        <button class="btn btn-link">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </div>
+  
+      <ul class="nav flex-column flex-grow-1 py-3">
+        <li class="nav-item">
+            <i class="bi bi-grid" (click)="goToDashboard()" title="Accueil"></i>
+        </li>
+        <li class="nav-item">
+            <i class="bi bi-speedometer2"></i>
+        </li>
+        <li class="nav-item">
+            <i class="bi bi-graph-up" (click)="goToPresence()" title="Liste présences"></i>
+        </li>
+        <li class="nav-item">
+
+            <i class="bi bi-person"  (click)="goToUsers()" title="Utilisateurs"></i>
+        </li>
+        <li class="nav-item">
+            <i class="bi bi-building" (click)="goToCohorte()" title="Gestion Cohorte"></i>
+        </li>
+        <li class="nav-item">
+            <i class="bi bi-mortarboard" (click)="goToDepartement()" title="Gestion Département"></i>
+        </li>
+        <li class="nav-item">
+            <i class="bi bi-list" (click)="goToHistorique()" title="Historique"></i>
+        </li>
+      </ul>
+  
+      <div class="text-center p-3">
+            <i class="bi bi-box-arrow-right" (click)="logout()" title="Déconnexion"></i>
+      </div>
+    </div>
+  </nav>
+  

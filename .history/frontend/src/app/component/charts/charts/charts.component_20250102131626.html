@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="row">
+        <!-- Filtres -->
+        <div class="row mb-3">
+            <div *ngFor="let filter of ['Quotidienne', 'Hebdomadaire', 'Mensuelle']" class="col-12 mb-2 d-block">
+              <button
+                class="btn btn-success"
+                [class.active]="selectedFilter === filter"
+                (click)="applyFilter(filter)"
+              >
+                {{ filter }}
+              </button>
+            </div>
+          </div>
+      <!-- Premier graphique avec les boutons de filtre -->
+      <div class="col-7">
+        
+        <!-- Graphique en ligne -->
+        <canvas
+          baseChart
+          [datasets]="lineChartData.datasets"
+          [labels]="lineChartData.labels"
+          [options]="lineChartOptions"
+          [type]="lineChartType"
+        >
+        </canvas>
+      </div>
+  
+      <!-- Deuxième graphique -->
+      <div class="col-5">
+        <canvas
+        class="w-100 vh-50 mt-5"
+          baseChart
+          [datasets]="barChartData.datasets"
+          [labels]="barChartData.labels"
+          [options]="barChartOptions"
+          [type]="barChartType"
+        >
+        </canvas>
+      </div>
+    </div>
+  </div>
+  

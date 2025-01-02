@@ -1,0 +1,92 @@
+<!-- dashboard.component.html -->
+<main>
+   
+
+    <!-- Cartes -->
+    <div class="container-fluid mt-4">
+        <div class="row gx-4 gy-3">
+            <!-- Colonne de la grande carte -->
+            <div class="col-md-4">
+                <div class="card big-card text-center p-4">
+                    <div class="mb-5">
+                        <i class="fas fa-sun icon"></i>
+                        <h3 class="fw-bold">8:02:09 AM</h3>
+                        <p>Realtime Insight</p>
+                    </div>
+                    <h5>Aujourd'hui :</h5>
+                    <h4>2 août 2023</h4>
+                </div>
+            </div>
+            
+            <!-- Colonne des 6 petites cartes -->
+            <div class="col-md-8">
+                <div class="row gx-3 gy-3">
+                    <!-- Carte 1 -->
+                    <div class="col-md-4">
+                        <div class="card text-center p-3">
+                            <i class="fas fa-users card-icon"></i>
+                            <h4>452</h4>
+                            <p>Total Employees</p>
+                            <small class="text-green"><i class="fas fa-plus-circle"></i> 2 nouveaux employés !</small>
+                        </div>
+                    </div>
+                    <!-- Carte 2 -->
+                    <div class="col-md-4">
+                        <div class="card text-center p-3">
+                            <i class="fas fa-clock card-icon"></i>
+                            <h4>360</h4>
+                            <p>À l'heure</p>
+                            <small class="text-green"><i class="fas fa-arrow-down"></i> -10% Moins qu'hier</small>
+                        </div>
+                    </div>
+                    <!-- Carte 3 -->
+                    <div class="col-md-4">
+                        <div class="card text-center p-3">
+                            <i class="fas fa-user-times card-icon"></i>
+                            <h4>30</h4>
+                            <p>Absent</p>
+                            <small class="text-red"><i class="fas fa-arrow-up"></i> +3% Augmentation</small>
+                        </div>
+                    </div>
+                    <!-- Carte 4 -->
+                    <div class="col-md-4">
+                        <div class="card text-center p-3">
+                            <i class="fas fa-user-clock card-icon"></i>
+                            <h4>62</h4>
+                            <p>Arrivée tardive</p>
+                            <small class="text-red"><i class="fas fa-arrow-up"></i> +3% Augmentation</small>
+                        </div>
+                    </div>
+                    <!-- Carte 5 -->
+                    <div class="col-md-4">
+                        <div class="card text-center p-3">
+                            <i class="fas fa-door-open card-icon"></i>
+                            <h4>6</h4>
+                            <p>Départs anticipés</p>
+                            <small class="text-green"><i class="fas fa-arrow-down"></i> -10% Moins qu'hier</small>
+                        </div>
+                    </div>
+                    <!-- Carte 6 -->
+                    <div class="col-md-4">
+                        <div class="card text-center p-3">
+                            <i class="fas fa-hourglass-end card-icon"></i>
+                            <h4>42</h4>
+                            <p>Départs tardifs</p>
+                            <small><i class="fas fa-arrow-up"></i> 2% Augmentation</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="graphs">
+            <div class="graph">
+                <canvas id="presenceChart"></canvas>
+            </div>
+            <div class="graph">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</main>
+  

@@ -1,0 +1,198 @@
+<app-sidebar></app-sidebar>
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header bg-light">
+      <h2 class="text-center">Inscription d'un Utilisateur</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()">
+        <div class="form-group row">
+          <label for="nom" class="col-sm-2 col-form-label">Nom</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="nom" formControlName="nom">
+            <div *ngIf="inscriptionForm.get('nom')?.invalid && inscriptionForm.get('nom')?.touched" class="text-danger">
+              Nom est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="prenom" formControlName="prenom">
+            <div *ngIf="inscriptionForm.get('prenom')?.invalid && inscriptionForm.get('prenom')?.touched" class="text-danger">
+              Prénom est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="email" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-10">
+            <input type="email" class="form-control" id="email" formControlName="email">
+            <div *ngIf="inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched" class="text-danger">
+              Email est incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="adresse" class="col-sm-2 col-form-label">Adresse</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="adresse" formControlName="adresse">
+            <div *ngIf="inscriptionForm.get('adresse')?.invalid && inscriptionForm.get('adresse')?.touched" class="text-danger">
+              Adresse est incorrecte.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="telephone" class="col-sm-2 col-form-label">Téléphone</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="telephone" formControlName="telephone">
+            <div *ngIf="inscriptionForm.get('telephone')?.invalid && inscriptionForm.get('telephone')?.touched" class="text-danger">
+              Téléphone est incorrect.
+            </div>
+            <div *ngIf="telephoneExists" class="text-danger">
+              Ce numéro de téléphone existe déjà.
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="fonction" class="col-sm-2 col-form-label">Fonction</label>
+          <div class="col-sm-10">
+            <select class="form-control" id="fonction" formControlName="fonction" (change)="onFonctionChange()">
+              <option value="vigile">Vigile</option>
+              <option value="apprenant">Apprenant</option>
+              <option value="employer">Employer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div *ngIf="inscriptionForm.get('fonction')?.invalid && inscriptionForm.get('fonction')?.touched" class="text-danger">
+              Fonction est incorrecte.
+            </div>
+          </div>
+        </div>
+        <div *ngIf="showNextStep">
+          <div *ngIf="fonction === 'vigile' || fonction === 'admin'">
+            <div class="form-group row">
+              <label for="mot_de_passe" class="col-sm-2 col-form-label">Nouveau mot de passe</label>
+              <div class="col-sm-10">
+                <div class="input-group">
+                  <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="mot_de_passe" formControlName="mot_de_passe">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" (click)="togglePasswordVisibility()">
+                      <i class="fas" [ngClass]="{'fa-eye': !showPassword, 'fa-eye-slash': showPassword}"></i>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="inscriptionForm.get('mot_de_passe')?.invalid && inscriptionForm.get('mot_de_passe')?.touched" class="text-danger">
+                  Nouveau mot de passe est incorrect.
+                </div>
+                <div class="mt-2">
+                  <span [ngClass]="{'text-danger': passwordStrength === 'Mauvais', 'text-warning': passwordStrength === 'Moyen', 'text-success': passwordStrength === 'Fort', 'text-info': passwordStrength === 'Bon'}">
+                    Force du mot de passe: {{ passwordStrength }}
+                  </span>
+                  <div class="progress mt-2">
+                    <div class="progress-bar" [ngClass]="{'bg-danger': passwordStrength === 'Mauvais', 'bg-warning': passwordStrength === 'Moyen', 'bg-success': passwordStrength === 'Fort', 'bg-info': passwordStrength === 'Bon'}" role="progressbar" [style.width]="getPasswordStrengthWidth() + '%'" aria-valuenow="getPasswordStrengthWidth()" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="confirm_mot_de_passe" class="col-sm-2 col-form-label">Confirmer le mot de passe</label>
+              <div class="col-sm-10">
+                <div class="input-group">
+                  <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control" id="confirm_mot_de_passe" formControlName="confirm_mot_de_passe">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" (click)="toggleConfirmPasswordVisibility()">
+                      <i class="fas" [ngClass]="{'fa-eye': !showConfirmPassword, 'fa-eye-slash': showConfirmPassword}"></i>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="inscriptionForm.get('confirm_mot_de_passe')?.invalid && inscriptionForm.get('confirm_mot_de_passe')?.touched" class="text-danger">
+                  Confirmation du mot de passe est incorrecte.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="fonction === 'apprenant'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="departement" class="col-sm-2 col-form-label">Département</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="departement" formControlName="departement">
+                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="cohorte" class="col-sm-2 col-form-label">Cohorte</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="cohorte" formControlName="cohorte">
+                  <option *ngFor="let cohorte of cohortes" [value]="cohorte.nom">{{ cohorte.nom }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="fonction === 'employer'">
+            <div class="form-group row">
+              <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+              <div class="col-sm-10">
+                <input type="file" class="form-control" id="photo" formControlName="photo">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="departement" class="col-sm-2 col-form-label">Département</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="departement" formControlName="departement">
+                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="card_id" class="col-sm-2 col-form-label">Assigner une carte</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="card_id" formControlName="card_id" placeholder="Scanner la carte">
+            <div *ngIf="inscriptionForm.get('card_id')?.invalid && inscriptionForm.get('card_id')?.touched" class="text-danger">
+              Card ID est incorrect.
+            </div>
+            <div *ngIf="cardIdExists" class="text-danger">
+              Cette carte existe déjà.
+            </div>
+           
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-10 offset-sm-2">
+            <button type="button" class="btn btn-primary" [disabled]="!inscriptionForm.valid" (click)="nextStep()">Suivant</button>
+            <button type="submit" class="btn btn-success" *ngIf="showNextStep">Soumettre</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de succès -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="successModalLabel">Succès</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        L'inscription a été effectuée avec succès !
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

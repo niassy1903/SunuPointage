@@ -1,0 +1,51 @@
+<!-- departement.component.html -->
+<app-sidebar></app-sidebar>
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <button class="btn btn-success me-2" (click)="addDepartment()">Ajouter</button>
+      <button class="btn btn-primary" (click)="exportCSV()">CSV</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div
+      class="col-md-4 mb-4"
+      *ngFor="let department of getPaginatedDepartments(); let i = index"
+    >
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ department.nom }}</h5>
+          <p class="card-text">Créé en : {{ department.annee_creation | date: 'yyyy' }}</p>
+          <p class="card-text">Année académique : {{ department.academicYear }}</p>
+         
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center mt-4">
+    <nav>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
+        </li>
+        <li
+          class="page-item"
+          [class.active]="currentPage === i + 1"
+          *ngFor="let i of generatePageArray(); let idx = index"
+        >
+          <a class="page-link" href="javascript:void(0)" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+ 
+</div>
