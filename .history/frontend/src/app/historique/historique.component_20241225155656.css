@@ -1,0 +1,35 @@
+:root {
+    --custom-color: #8DBB36;
+  }
+  
+  .historique-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .historique-container h2 {
+    color: var(--custom-color);
+  }
+  
+  .historique-container .form-control {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .historique-container .table th {
+    background-color: var(--custom-color);
+    color: white;
+  }
+  
+  .historique-container .pagination .page-item.active .page-link {
+    background-color: var(--custom-color);
+    border-color: var(--custom-color);
+  }
+  
+  .historique-container .pagination .page-link {
+    color: var(--custom-color);
+  }
+  
