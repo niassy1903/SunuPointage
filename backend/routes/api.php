@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UtilisateurController;
 use App\Http\Controllers\DepartementController;
 use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PointageController;
+use App\Http\Controllers\HistoricPointageController;
+
 
 
 
@@ -13,7 +16,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
+//Réinitialized Password Controller with email
+Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
+Route::post('password/reset', [ForgotPasswordController::class, 'resetPassword']);
 
 
 
@@ -31,6 +36,28 @@ Route::put('/pointages/{id}', [PointageController::class, 'update']);
 
 Route::get('/pointage/{cardId}', [PointageController::class, 'getPointageByCardId']);
 
+
+
+// Récupérer le total des pointages par jour (avec une date spécifique)
+Route::get('/pointages/totals/{date}', [PointageController::class, 'getTotalPointages']);
+
+// Récupérer le total des pointages validés par jour (avec une date spécifique)
+Route::get('/pointages/validations/{date}', [PointageController::class, 'getTotalValidations']);
+
+// Récupérer le total des pointages rejetés par jour (avec une date spécifique)
+Route::get('/pointages/rejets/{date}', [PointageController::class, 'getTotalRejets']);
+// Récupérer les statistiques des pointages par statut pour une date spécifique
+Route::get('/pointages/statistiques/{date}', [PointageController::class, 'getStatistiquesPointages']);
+
+
+// Groupe de routes pour les APIs de HistoricPointage
+Route::prefix('historic-pointages')->group(function () {
+    Route::get('/', [HistoricPointageController::class, 'index']); // Lister tous les historiques
+    Route::post('/', [HistoricPointageController::class, 'store']); // Créer un historique
+    Route::get('/{id}', [HistoricPointageController::class, 'show']); // Voir un historique spécifique
+    Route::put('/{id}', [HistoricPointageController::class, 'update']); // Mettre à jour un historique
+    Route::delete('/{id}', [HistoricPointageController::class, 'destroy']); // Supprimer un historique
+});
 
 
 

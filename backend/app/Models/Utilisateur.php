@@ -1,12 +1,18 @@
 <?php
+
 namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 
-class Utilisateur extends Model
+class Utilisateur extends Model implements CanResetPassword
 {
+    use Notifiable, CanResetPasswordTrait;
+
     // Connexion à MongoDB
     protected $connection = 'mongodb';
     protected $collection = 'utilisateurs';
@@ -20,15 +26,15 @@ class Utilisateur extends Model
         'telephone',
         'fonction',
         'photo',
-        'mot_de_passe', // Le mot de passe sera enregistré sous forme hachée
+        'mot_de_passe',
         'date_creation',
         'date_suppression',
         'date_modification',
         'departement',
         'cohorte',
         'matricule',
-        'status', // Nouveau champ ajouté
-        'card_id', // Nouveau champ pour l'ID de la carte RFID
+        'status',
+        'card_id',
     ];
 
     // Cast des dates
@@ -38,6 +44,12 @@ class Utilisateur extends Model
         'date_modification' => 'datetime',
     ];
 
+    // Méthode nécessaire pour la réinitialisation du mot de passe
+    public function getEmailForPasswordReset()
+    {
+        return $this->email;
+    }
+
     // Actions lors de la création, mise à jour et suppression
     protected static function boot()
     {
@@ -45,7 +57,7 @@ class Utilisateur extends Model
 
         static::creating(function ($model) {
             $model->date_creation = Carbon::now();
-            $model->status = 'actif'; // Définir "statut" sur "actif" par défaut
+            $model->status = 'actif'; 
         });
 
         static::updating(function ($model) {
@@ -61,11 +73,10 @@ class Utilisateur extends Model
     // Setter pour hacher automatiquement le mot de passe avant de l'enregistrer
     public function setMotDePasseAttribute($value)
     {
-        // Hacher le mot de passe uniquement s'il n'est pas déjà haché
         $this->attributes['mot_de_passe'] = bcrypt($value);
     }
 
-    // Setter pour la fonction (validation des valeurs possibles)
+    // Setter pour la fonction
     public function setFonctionAttribute($value)
     {
         $validFunctions = ['apprenant', 'vigile', 'admin', 'employer'];
@@ -80,4 +91,9 @@ class Utilisateur extends Model
         $exists = Utilisateur::where('telephone', $telephone)->exists();
         return response()->json(['exists' => $exists]);
     }
+    public function historicPointages()
+    {
+        return $this->hasMany(HistoricPointage::class, 'utilisateur_id');
+    }
+
 }

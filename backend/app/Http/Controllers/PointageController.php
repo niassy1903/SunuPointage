@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 use App\Models\Pointage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class PointageController extends Controller
 {
@@ -40,16 +39,14 @@ class PointageController extends Controller
             ->first();
 
         if ($existingPointage) {
-            // Si un pointage existe déjà, retourner une erreur
             return response()->json(['error' => 'Un pointage existe déjà pour cette carte aujourd\'hui'], 400);
         } else {
-            // Créer un nouveau pointage
             if (!isset($validatedData['heure_arrivee'])) {
                 return response()->json(['error' => 'Heure d\'arrivée requise pour un nouveau pointage'], 400);
             }
 
             $validatedData['date_actuelle'] = $today;
-            $validatedData['heure_depart'] = null; // Définir explicitement heure_depart comme null
+            $validatedData['heure_depart'] = null;
             $pointage = Pointage::create($validatedData);
 
             return response()->json($pointage, 201);
@@ -60,9 +57,6 @@ class PointageController extends Controller
     public function getPointageByCardId($cardId)
     {
         $today = Carbon::today()->toDateString();
-
-        // Log pour vérifier la requête
-        Log::debug('Recherche pointage avec carte_id:', ['carte_id' => $cardId, 'date' => $today]);
 
         $pointage = Pointage::where('carte_id', $cardId)
             ->whereDate('date_actuelle', $today)
@@ -79,7 +73,7 @@ class PointageController extends Controller
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'heure_depart' => 'nullable|date_format:H:i', // Champ facultatif
+            'heure_depart' => 'nullable|date_format:H:i',
         ]);
 
         $pointage = Pointage::findOrFail($id);
@@ -87,4 +81,69 @@ class PointageController extends Controller
 
         return response()->json($pointage);
     }
+    public function getTotalPointages($date)
+    {
+        // Convertir la date au bon format si nécessaire
+        $date = Carbon::parse($date)->toDateString();
+        $totalPointages = Pointage::whereDate('date_actuelle', $date)->count();
+    
+        return response()->json(['date' => $date, 'total_pointages' => $totalPointages]);
+    }
+    
+    public function getTotalValidations($date)
+    {
+        // Convertir la date au bon format si nécessaire
+        $date = Carbon::parse($date)->toDateString();
+        $totalValidations = Pointage::whereDate('date_actuelle', $date)
+            ->where('validation', 'validée')
+            ->count();
+    
+        return response()->json(['date' => $date, 'total_validations' => $totalValidations]);
+    }
+    
+    public function getTotalRejets($date)
+    {
+        // Convertir la date au bon format si nécessaire
+        $date = Carbon::parse($date)->toDateString();
+        $totalRejets = Pointage::whereDate('date_actuelle', $date)
+            ->where('validation', 'rejetée')
+            ->count();
+    
+        return response()->json(['date' => $date, 'total_rejets' => $totalRejets]);
+    }
+
+    
+    public function getStatistiquesPointages($date)
+{
+    $pointages = Pointage::whereDate('date_actuelle', $date)->get();
+
+    $statistiques = [
+        'total_employes' => $pointages->count(),
+        'present' => 0,
+        'retard' => 0,
+        'absent' => 0,
+        'depart_anticipé' => 0,
+        'depart_tardif' => 0,
+    ];
+
+    foreach ($pointages as $pointage) {
+        $heureArrivee = $pointage->heure_arrivee;
+        $heureDepart = $pointage->heure_depart;
+
+        if (!$heureArrivee) {
+            $statistiques['absent']++;
+        } elseif ($heureArrivee > '08:30') {
+            $statistiques['retard']++;
+        } elseif ($heureDepart && $heureDepart < '17:00') {
+            $statistiques['depart_anticipé']++;
+        } elseif ($heureDepart && $heureDepart > '17:00') {
+            $statistiques['depart_tardif']++;
+        } else {
+            $statistiques['present']++;
+        }
+    }
+
+    return response()->json($statistiques);
+}
+
 }
