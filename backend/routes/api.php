@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 
 
 
+Route::get('/utilisateurs/card/{cardId}', [UtilisateurController::class, 'getUtilisateurByCardId']);
 
 
 // Route pour récupérer tous les pointages
@@ -42,6 +43,7 @@ Route::get('employers/{departement}', [UtilisateurController::class, 'getEmploye
 
 
 Route::get('/utilisateurs/apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getApprenantsByCohorte']);
+Route::get('/utilisateurs/liste-apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getListeApprenantsByCohorte']);
 
 
 Route::post('/assign-card', [UtilisateurController::class, 'assignCard']);
@@ -69,3 +71,12 @@ Route::apiResource('cohortes', CohorteController::class);
 Route::patch('/utilisateurs/{id}/bloquer', [UtilisateurController::class, 'bloquer']);
 
 Route::get('/telephones/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
+
+
+
+
+
+
+
+
+Route::post('/create-pointage', [PointageController::class, 'createPointage']);

@@ -15,6 +15,19 @@ class UtilisateurController extends Controller
         return Utilisateur::all();
     }
 
+    public function getUtilisateurByCardId($cardId)
+{
+    $utilisateur = Utilisateur::where('card_id', $cardId)->first();
+
+    if (!$utilisateur) {
+        return response()->json(['message' => 'Carte ID non trouvée'], 404);
+    }
+
+    return response()->json(['utilisateur' => $utilisateur], 200);
+}
+
+
+
     public function loginByCardId(Request $request)
     {
         Log::info('Card ID reçu : ' . $request->card_id);
@@ -180,6 +193,21 @@ class UtilisateurController extends Controller
 
         return response()->json($employers, 200);
     }
+
+            // Dans UtilisateurController
+        public function getListeApprenantsByCohorte($cohorte)
+        {
+            $apprenants = Utilisateur::where('fonction', 'apprenant')
+                                    ->where('cohorte', $cohorte)
+                                    ->get();
+
+            if ($apprenants->isEmpty()) {
+                return response()->json(['message' => 'Aucun apprenant trouvé pour cette cohorte'], 404);
+            }
+
+            return response()->json($apprenants, 200);
+        }
+
 
     // Méthode pour obtenir le nombre d'apprenants dans une cohorte spécifique
     public function getApprenantsByCohorte($cohorte)

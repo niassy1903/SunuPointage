@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Pointage;
@@ -24,37 +25,76 @@ class PointageController extends Controller
 
     public function store(Request $request)
     {
+        // Validation des données
         $validatedData = $request->validate([
             'carte_id' => 'required|string',
             'nom' => 'required|string',
             'prenom' => 'required|string',
             'heure_arrivee' => 'nullable|date_format:H:i',
             'heure_depart' => 'nullable|date_format:H:i',
-            'statut' => 'nullable|in:present,absent,malade,conge,retard',
+            'statut' => 'nullable|in:present,absent,malade,conge,retard,rejeter',
         ]);
-
+    
         $today = Carbon::now()->toDateString();
-
+    
+        // Vérification de pointage existant
         $existingPointage = Pointage::where('carte_id', $validatedData['carte_id'])
+            ->where('date_actuelle', $today)
+            ->first();
+    
+        if ($existingPointage) {
+            return response()->json([
+                'error' => 'Un pointage existe déjà pour cette carte aujourd\'hui',
+                'carte_id' => $validatedData['carte_id']
+            ], 400);
+        }
+    
+        // Création du pointage
+        $validatedData['date_actuelle'] = $today;
+        $validatedData['heure_depart'] = $validatedData['heure_depart'] ?? null;
+        $pointage = Pointage::create($validatedData);
+    
+        return response()->json($pointage, 201);
+    }
+    
+
+
+public function createPointage(Request $request)
+{
+    $validatedData = $request->validate([
+        '*.carte_id' => 'required|string',
+        '*.nom' => 'required|string',
+        '*.prenom' => 'required|string',
+        '*.heure_arrivee' => 'nullable|date_format:H:i',
+        '*.heure_depart' => 'nullable|date_format:H:i',
+        '*.statut' => 'nullable|in:present,absent,malade,conge,retard,rejeter',
+    ]);
+
+    $today = Carbon::now()->toDateString();
+    $createdPointages = [];
+
+    foreach ($validatedData as $data) {
+        $existingPointage = Pointage::where('carte_id', $data['carte_id'])
             ->where('date_actuelle', $today)
             ->first();
 
         if ($existingPointage) {
-            // Si un pointage existe déjà, retourner une erreur
-            return response()->json(['error' => 'Un pointage existe déjà pour cette carte aujourd\'hui'], 400);
-        } else {
-            // Créer un nouveau pointage
-            if (!isset($validatedData['heure_arrivee'])) {
-                return response()->json(['error' => 'Heure d\'arrivée requise pour un nouveau pointage'], 400);
-            }
-
-            $validatedData['date_actuelle'] = $today;
-            $validatedData['heure_depart'] = null; // Définir explicitement heure_depart comme null
-            $pointage = Pointage::create($validatedData);
-
-            return response()->json($pointage, 201);
+            return response()->json([
+                'error' => 'Un pointage existe déjà pour cette carte aujourd\'hui',
+                'carte_id' => $data['carte_id']
+            ], 400);
         }
+
+        $data['date_actuelle'] = $today;
+        $data['heure_depart'] = $data['heure_depart'] ?? null;
+        $pointage = Pointage::create($data);
+        $createdPointages[] = $pointage;
     }
+
+    return response()->json($createdPointages, 201);
+}
+
+
 
     // Fonction pour obtenir un pointage par carte_id
     public function getPointageByCardId($cardId)
@@ -75,16 +115,48 @@ class PointageController extends Controller
         }
     }
 
-    // Mettre à jour un pointage existant
-    public function update(Request $request, $id)
+   // Mettre à jour un pointage existant à partir du carte_id
+public function update(Request $request, $carte_id)
+{
+    $validatedData = $request->validate([
+        'heure_depart' => 'nullable|date_format:H:i', // Champ facultatif
+    ]);
+
+    $today = Carbon::today()->toDateString();
+
+    // Recherche du pointage par carte_id et date_actuelle
+    $pointage = Pointage::where('carte_id', $carte_id)
+        ->whereDate('date_actuelle', $today)
+        ->first();
+
+    if (!$pointage) {
+        return response()->json(['error' => 'Pointage non trouvé pour ce carte_id aujourd\'hui'], 404);
+    }
+
+    // Mise à jour du pointage
+    $pointage->update($validatedData);
+
+    return response()->json($pointage);
+}
+
+
+    // Rejeter un pointage
+    public function reject(Request $request)
     {
         $validatedData = $request->validate([
-            'heure_depart' => 'nullable|date_format:H:i', // Champ facultatif
+            'carte_id' => 'required|string',
+            'nom' => 'required|string',
+            'prenom' => 'required|string',
+            'statut' => 'required|in:rejeter',
         ]);
 
-        $pointage = Pointage::findOrFail($id);
-        $pointage->update($validatedData);
+        $validatedData['heure_arrivee'] = null;
+        $validatedData['heure_depart'] = null;
+        $validatedData['date_actuelle'] = Carbon::now()->toDateString();
 
-        return response()->json($pointage);
+        $pointage = Pointage::create($validatedData);
+
+        return response()->json($pointage, 201);
     }
+    
 }

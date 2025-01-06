@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cohorte;
+use App\Models\Utilisateur; // Assurez-vous d'importer le modèle Utilisateur
 use Illuminate\Http\Request;
 
 class CohorteController extends Controller
@@ -31,20 +32,40 @@ class CohorteController extends Controller
     public function update(Request $request, $id)
     {
         $cohorte = Cohorte::findOrFail($id);
+
+        // Validation conditionnelle des champs
         $request->validate([
             'nom' => 'sometimes|required',
             'annee_creation' => 'sometimes|required|date',
             'description' => 'nullable',
         ]);
 
-        $cohorte->update($request->all());
-        return $cohorte;
+        // Mise à jour uniquement des champs présents dans la requête
+        $cohorte->update($request->only(['nom', 'annee_creation', 'description']));
+
+        return response()->json($cohorte, 200);
     }
 
     public function destroy($id)
     {
         $cohorte = Cohorte::findOrFail($id);
+
+        // Vérifiez si la cohorte a des utilisateurs avec la fonction "apprenant"
+        $apprenants = Utilisateur::where('cohorte', $cohorte->nom)
+                                 ->where('fonction', 'apprenant')
+                                 ->get();
+
+        // Suppression des apprenants associés
+        if ($apprenants->isNotEmpty()) {
+            foreach ($apprenants as $apprenant) {
+                $apprenant->delete();
+            }
+        }
+
+        // Suppression de la cohorte
         $cohorte->delete();
-        return response()->json(null, 204);
+
+        return response()->json(null, 204);  // Suppression réussie sans contenu
     }
 }
+
