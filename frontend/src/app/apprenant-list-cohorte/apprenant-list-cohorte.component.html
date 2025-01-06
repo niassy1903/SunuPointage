@@ -1,0 +1,55 @@
+<div class="container mt-5">
+    <h2>Liste des Apprenants de la cohorte {{ cohorteName }}</h2>
+    <div class="mb-3">
+      <input type="text" class="form-control" placeholder="Rechercher par matricule..." [(ngModel)]="searchTerm" (input)="filterApprenants()">
+    </div>
+    <table class="table table-bordered table-hover">
+      <thead class="thead-light">
+        <tr>
+          <th>Utilisateurs</th>
+          <th>Matricule</th>
+          <th>Email</th>
+          <th>Adresse</th>
+          <th>Cohorte</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let apprenant of paginatedApprenants">
+          <td>
+            <img [src]="apprenant.photoUrl" alt="{{ apprenant.nom }}" class="rounded-circle mr-2" style="width: 30px; height: 30px;">
+            {{ apprenant.nom }}
+          </td>
+          <td>{{ apprenant.matricule }}</td>
+          <td>{{ apprenant.email }}</td>
+          <td>{{ apprenant.adresse }}</td>
+          <td>{{ cohorteName }}</td>
+          <td>
+            <span class="badge" [ngClass]="{'badge-success': apprenant.status === 'Active', 'badge-danger': apprenant.status === 'Banned', 'badge-warning': apprenant.status === 'Inactive'}">
+              {{ apprenant.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-center mt-4">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Précédent</a>
+          </li>
+          <li
+            class="page-item"
+            [class.active]="currentPage === i + 1"
+            *ngFor="let i of generatePageArray(); let idx = index"
+          >
+            <a class="page-link" href="javascript:void(0)" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Suivant</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  

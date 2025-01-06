@@ -9,7 +9,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { debounceTime, switchMap } from 'rxjs/operators';
 
-
 declare var bootstrap: any;
 
 @Component({
@@ -17,7 +16,7 @@ declare var bootstrap: any;
   templateUrl: './inscription.component.html',
   styleUrls: ['./inscription.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule,  HttpClientModule, FormsModule, RouterModule],
+  imports: [ReactiveFormsModule, CommonModule, HttpClientModule, FormsModule, RouterModule],
   providers: [UtilisateurService, DepartementService, CohorteService]
 })
 export class InscriptionComponent implements OnInit, OnDestroy {
@@ -54,7 +53,7 @@ export class InscriptionComponent implements OnInit, OnDestroy {
       cohorte: [''],
       mot_de_passe: ['', [Validators.minLength(6), this.passwordStrengthValidator()]],
       confirm_mot_de_passe: ['', [Validators.minLength(6)]],
-      card_id: ['', Validators.required] // Ajout du champ card_id
+      card_id: ['', Validators.nullValidator] // Ajout du champ card_id avec nullValidator
     }, { validator: this.passwordMatchValidator });
 
     this.inscriptionForm.get('telephone')?.valueChanges

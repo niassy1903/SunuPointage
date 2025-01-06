@@ -1,0 +1,78 @@
+/* Centrer le formulaire */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Mise en forme du formulaire */
+  .form-control {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .form-control:focus {
+    border-color: #4caf50;
+    outline: none;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+  }
+  
+  /* Styles des boutons */
+  .btn {
+    padding: 0.5rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-success {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .btn-success:hover {
+    background-color: #45a049;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #5a6268;
+  }
+  
+  /* Styles du modal de succès */
+  .success-modal .modal-header {
+    background-color: #28a745;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .success-modal .modal-body {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .success-modal .modal-footer {
+    justify-content: center;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+    .form-control {
+      font-size: 0.9rem;
+    }
+    .btn {
+      padding: 0.4rem 1rem;
+    }
+  }
+  

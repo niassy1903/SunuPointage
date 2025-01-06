@@ -8,7 +8,6 @@ import { DepartementService } from '../departement.service';
 import { CohorteService } from '../cohorte.service';
 import * as Papa from 'papaparse'; // Importation de PapaParse pour lire le CSV
 
-
 interface User {
   id: string;
   photo: string;
@@ -29,7 +28,7 @@ interface User {
   templateUrl: './utilisateur.component.html',
   styleUrls: ['./utilisateur.component.css'],
   standalone: true,
-  imports: [CommonModule,  FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   providers: [UtilisateurService, CohorteService, DepartementService]
 })
 export class UtilisateurComponent implements OnInit {
@@ -40,11 +39,15 @@ export class UtilisateurComponent implements OnInit {
   filteredUsers: User[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
-  itemsPerPage: number = 4;
+  itemsPerPage: number = 6;
   selectAll: boolean = false;
   selectedUsersCount: number = 0;
   userToDelete: User | null = null;
   userToBlock: User | null = null;
+  showDeleteModal: boolean = false;
+  showBlockModal: boolean = false;
+  showDeleteSelectedModal: boolean = false;
+  showBlockSelectedModal: boolean = false;
 
   ngOnInit() {
     // Appel du service pour récupérer les utilisateurs
@@ -117,6 +120,7 @@ export class UtilisateurComponent implements OnInit {
   // Suppression d'un utilisateur
   setUserToDelete(user: User) {
     this.userToDelete = user;
+    this.showDeleteModal = true;
   }
 
   confirmDeleteUser() {
@@ -126,7 +130,9 @@ export class UtilisateurComponent implements OnInit {
           this.users = this.users.filter(u => u.id !== this.userToDelete!.id);
           this.filteredUsers = this.filteredUsers.filter(u => u.id !== this.userToDelete!.id);
           this.userToDelete = null;
-          document.getElementById('deleteModal')?.click(); // Fermer le modal
+          this.showDeleteModal = false; // Masquer le modal
+          this.updatePagination(); // Actualiser le tableau
+          this.router.navigate(['/utilisateur']); // Rediriger vers la page des utilisateurs
         },
         (error) => {
           console.error('Erreur lors de la suppression de l\'utilisateur :', error);
@@ -138,6 +144,7 @@ export class UtilisateurComponent implements OnInit {
   // Blocage d'un utilisateur
   setUserToBlock(user: User) {
     this.userToBlock = user;
+    this.showBlockModal = true;
   }
 
   confirmBlockUser() {
@@ -149,7 +156,9 @@ export class UtilisateurComponent implements OnInit {
             this.userToBlock.status = 'Bloqué';
           }
           this.userToBlock = null;
-          document.getElementById('blockModal')?.click(); // Fermer le modal
+          this.showBlockModal = false; // Masquer le modal
+          this.updatePagination(); // Actualiser le tableau
+          this.router.navigate(['/utilisateur']); // Rediriger vers la page des utilisateurs
         },
         (error) => {
           console.error('Erreur lors du blocage de l\'utilisateur :', error);
@@ -178,7 +187,9 @@ export class UtilisateurComponent implements OnInit {
         }
       );
     });
-    document.getElementById('deleteSelectedModal')?.click(); // Fermer le modal
+    this.showDeleteSelectedModal = false; // Masquer le modal
+    this.updatePagination(); // Actualiser le tableau
+    this.router.navigate(['/utilisateur']); // Rediriger vers la page des utilisateurs
   }
 
   // Blocage des utilisateurs sélectionnés
@@ -198,7 +209,9 @@ export class UtilisateurComponent implements OnInit {
         }
       );
     });
-    document.getElementById('blockSelectedModal')?.click(); // Fermer le modal
+    this.showBlockSelectedModal = false; // Masquer le modal
+    this.updatePagination(); // Actualiser le tableau
+    this.router.navigate(['/utilisateur']); // Rediriger vers la page des utilisateurs
   }
 
   // Sélectionner/désélectionner tous les utilisateurs

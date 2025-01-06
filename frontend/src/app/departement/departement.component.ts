@@ -1,4 +1,3 @@
-// departement.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './departement.component.html',
   styleUrls: ['./departement.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule], // Ajoutez ListeComponent ici
+  imports: [FormsModule, CommonModule, HttpClientModule],
   providers: [UtilisateurService, CohorteService, DepartementService]
 })
 export class DepartementComponent implements OnInit {
@@ -21,8 +20,6 @@ export class DepartementComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 6; // Modifié pour afficher 6 éléments par page
   totalPages: number = 1;
-  selectedDepartment: any = null;
-  departmentUsers: any[] = []; // Ajout de la propriété departmentUsers
 
   constructor(private departementService: DepartementService, private utilisateurService: UtilisateurService, private router: Router) {}
 
@@ -57,7 +54,6 @@ export class DepartementComponent implements OnInit {
     this.currentPage = page;
   }
 
-
   // Exportation des données en CSV (à adapter selon votre logique)
   exportCSV() {
     console.log('Exporter en CSV - À implémenter');
@@ -69,16 +65,8 @@ export class DepartementComponent implements OnInit {
     return this.departments.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
-  view(department: any) {
-    this.selectedDepartment = department;
-    this.utilisateurService.getUtilisateursByDepartmentAndFunction(department.nom, 'employer').subscribe({
-      next: (data) => {
-        this.departmentUsers = data;
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des employés :', err);
-      }
-    });
+  viewDepartment(department: any) {
+    this.router.navigate(['/departements', department.nom, 'employees']);
   }
 
   generatePageArray() {

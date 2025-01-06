@@ -22,7 +22,6 @@ export class LoginComponent implements OnInit {
   passwordVisible: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
-  showCardInput: boolean = false;
   ws!: WebSocket;
 
   constructor(private utilisateurService: UtilisateurService, private router: Router) { }
@@ -34,7 +33,6 @@ export class LoginComponent implements OnInit {
       const data = JSON.parse(event.data);
       if (data.type === 'cardRead') {
         this.cardId = data.cardId;
-        this.showCardInput = true;
         this.confirmCardLogin();
       }
     };
@@ -46,12 +44,9 @@ export class LoginComponent implements OnInit {
         console.log('Login successful', response);
         if (response.utilisateur.fonction === 'admin') {
           this.successMessage = 'Connexion réussie';
-          this.showSuccessModal(() => {
-            this.redirectBasedOnRole(response.utilisateur);
-          });
+          this.redirectBasedOnRole(response.utilisateur);
         } else {
           this.errorMessage = 'Accès non autorisé';
-          this.showUnauthorizedModal();
         }
       },
       error => {
@@ -72,9 +67,7 @@ export class LoginComponent implements OnInit {
       response => {
         console.log('Login successful', response);
         this.successMessage = 'Connexion réussie';
-        this.showSuccessModal(() => {
-          this.redirectBasedOnRole(response.utilisateur);
-        });
+        this.redirectBasedOnRole(response.utilisateur);
       },
       error => {
         console.error('Login failed', error);
@@ -86,79 +79,6 @@ export class LoginComponent implements OnInit {
           this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
         }
       }
-    );
-  }
-
-  showSuccessModal(onConfirm: () => void) {
-    const modalElement = document.getElementById('loginSuccessModal');
-    const modal = new bootstrap.Modal(modalElement!);
-
-    // Affiche le modal
-    modal.show();
-
-    // Ajout d'un écouteur pour le bouton "OK"
-    const confirmButton = document.getElementById('confirmRedirect');
-    confirmButton?.addEventListener(
-      'click',
-      () => {
-        // Ferme le modal
-        modal.hide();
-
-        // Redirection après fermeture complète du modal
-        modalElement?.addEventListener(
-          'hidden.bs.modal',
-          () => {
-            onConfirm();
-          },
-          { once: true } // Ajout pour éviter d'exécuter plusieurs fois
-        );
-      },
-      { once: true }
-    );
-  }
-
-  showUnauthorizedModal() {
-    const modalElement = document.getElementById('unauthorizedModal');
-    const modal = new bootstrap.Modal(modalElement!);
-    modal.show();
-
-    // Ajout d'un écouteur pour le bouton "OK" et "Close"
-    const confirmButton = document.getElementById('confirmRedirectUnauthorized');
-    confirmButton?.addEventListener(
-      'click',
-      () => {
-        // Ferme le modal
-        modal.hide();
-
-        // Redirection après fermeture complète du modal
-        modalElement?.addEventListener(
-          'hidden.bs.modal',
-          () => {
-            this.showCardInput = false;
-          },
-          { once: true } // Ajout pour éviter d'exécuter plusieurs fois
-        );
-      },
-      { once: true }
-    );
-
-    const closeButton = modalElement?.querySelector('.btn-close');
-    closeButton?.addEventListener(
-      'click',
-      () => {
-        // Ferme le modal
-        modal.hide();
-
-        // Redirection après fermeture complète du modal
-        modalElement?.addEventListener(
-          'hidden.bs.modal',
-          () => {
-            this.showCardInput = false;
-          },
-          { once: true } // Ajout pour éviter d'exécuter plusieurs fois
-        );
-      },
-      { once: true }
     );
   }
 

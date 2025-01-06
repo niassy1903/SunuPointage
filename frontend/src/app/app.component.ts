@@ -19,13 +19,14 @@ import { Router, NavigationEnd } from '@angular/router';
 })
 export class AppComponent {
   showLayout = true; // Contrôle l'affichage du header et du sidebar
+  title: any;
 
   constructor(private router: Router) {
     // Détection des changements de route
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         // Masquer le layout sur la page de connexion
-        this.showLayout = event.url !== '/' && event.url !== '/login';
+        this.showLayout = event.url !== '/' && event.url !== '/login'; 
       }
     });
   }

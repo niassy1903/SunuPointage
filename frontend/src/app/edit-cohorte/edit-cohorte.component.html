@@ -1,0 +1,80 @@
+<div class="container mt-5">
+  <h3>Modifier la Cohorte</h3>
+  <form>
+    <div class="mb-3">
+      <label for="name" class="form-label">Nom</label>
+      <input
+        type="text"
+        id="name"
+        class="form-control"
+        [(ngModel)]="cohorte.nom"
+        name="name"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="annee_creation" class="form-label">Année de création</label>
+      <input
+        type="text"
+        id="annee_creation"
+        class="form-control"
+        [(ngModel)]="cohorte.annee_creation"
+        name="annee_creation"
+        required
+        placeholder="jj/mm/aaaa"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        id="description"
+        class="form-control"
+        [(ngModel)]="cohorte.description"
+        name="description"
+      ></textarea>
+    </div>
+
+    <div class="mb-3">
+      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/cohorte'])">Annuler</button>
+      <button type="button" class="btn btn-primary" (click)="updateCohorte()">Enregistrer</button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal de succès -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Succès</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        La cohorte a été mise à jour avec succès.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal d'erreur -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="errorModalLabel">Erreur</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Une erreur s'est produite lors de la mise à jour de la cohorte.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

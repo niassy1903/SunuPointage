@@ -34,6 +34,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
   private pointageId: string | null = null;
   private pointageModal: any;
   isFirstPointageDone: boolean = false;
+  private ws: WebSocket | null = null; // Initialiser avec null
 
   constructor(private utilisateurService: UtilisateurService) {}
 
@@ -49,31 +50,37 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
+    if (this.ws) {
+      this.ws.close();
+    }
   }
 
   connectWebSocket() {
-    const ws = new WebSocket('ws://localhost:8080');
+    this.ws = new WebSocket('ws://localhost:8081');
 
-    ws.onmessage = (event) => {
+    this.ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      const cardId = message.cardId;
-      console.log('Card ID reçu :', cardId);
-      this.formData.cardId = cardId;
-      this.loginByCardId(cardId);
+      if (message.type === 'cardRead') {
+        const cardId = message.cardId;
+        console.log('Card ID reçu :', cardId);
+        this.formData.cardId = cardId;
+        this.loginByCardId(cardId);
+      }
     };
 
-    ws.onopen = () => {
+    this.ws.onopen = () => {
       console.log('Connexion WebSocket ouverte');
     };
 
-    ws.onclose = () => {
+    this.ws.onclose = () => {
       console.log('Connexion WebSocket fermée');
     };
 
-    ws.onerror = (error) => {
+    this.ws.onerror = (error) => {
       console.error('Erreur WebSocket :', error);
     };
   }
+
 
   loginByCardId(cardId: string) {
     this.utilisateurService.loginByCardId(cardId).subscribe(
@@ -95,54 +102,56 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       }
     );
   }
-
+  
   checkPointageStatus(cardId: string) {
-    this.utilisateurService.getPointageByCardId(cardId).subscribe(
-      (response) => {
-        if (response && response.heure_depart === null) {
-          this.pointageId = response.id;
-          this.isFirstPointageDone = true;
-        } else {
-          this.pointageId = null;
-          this.isFirstPointageDone = false;
-        }
-      },
-      (error) => {
-        console.error('Erreur lors de la récupération du pointage :', error);
-        this.pointageId = null;
-        this.isFirstPointageDone = false;
-      }
-    );
-  }
-
-  onSubmit() {
-    this.showPointageModal();
-  }
-
-  showPointageModal() {
-    const modalElement = document.getElementById('pointageModal');
-    if (modalElement) {
-      this.pointageModal = new bootstrap.Modal(modalElement);
-      this.pointageModal.show();
+    const storedCardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
+    
+    if (storedCardIds.includes(cardId)) {
+      // Ce cardId a déjà été pointé (il est stocké dans localStorage)
+      this.isFirstPointageDone = true;
+    } else {
+      // C'est un premier pointage
+      this.isFirstPointageDone = false;
     }
   }
-
+  
+  confirmPointage() {
+    const storedCardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
+    if (storedCardIds.includes(this.formData.cardId)) {
+      // Deuxième pointage
+      this.confirmSecondPointage();
+    } else {
+      // Premier pointage
+      this.confirmFirstPointage();
+    }
+  }
+  
   confirmFirstPointage() {
-    const heureArrivee = this.formatTime(new Date());
+    const heureArrivee = new Date();
+    const formattedHeureArrivee = this.formatTime(heureArrivee);
+  
+    const heureLimite = "09:00"; // Heure limite pour considérer un pointage à l'heure
+    const estRetard = this.isHeureDeRetard(formattedHeureArrivee, heureLimite);
+  
     const pointageData: any = {
       carte_id: this.formData.cardId,
       nom: this.formData.name,
       prenom: this.formData.prenom,
-      heure_arrivee: heureArrivee,
-      statut: 'present',
+      heure_arrivee: formattedHeureArrivee,
+      statut: estRetard ? 'retard' : 'present',
     };
-
+  
     this.utilisateurService.createPointage(pointageData).subscribe(
       (response) => {
         console.log('Pointage créé :', response);
         this.pointageId = response.id;
         this.isFirstPointageDone = true;
-        this.pointageModal.hide(); // Fermer le modal de validation
+  
+        // Ajouter le cardId dans un tableau stocké dans localStorage
+        let cardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
+        cardIds.push(this.formData.cardId);
+        localStorage.setItem('cardIds', JSON.stringify(cardIds));
+  
         this.showSuccessModal();
       },
       (error) => {
@@ -150,27 +159,66 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       }
     );
   }
-
-  confirmSecondPointage() {
-    if (this.pointageId) {
-      const heureDepart = this.formatTime(new Date());
-      const pointageData: any = {
-        heure_depart: heureDepart,
-      };
-
-      this.utilisateurService.updatePointage(this.pointageId, pointageData).subscribe(
-        (response) => {
-          console.log('Pointage mis à jour :', response);
-          this.pointageModal.hide(); // Fermer le modal de validation
-          this.showSuccessModal();
-        },
-        (error) => {
-          console.error('Erreur lors de la mise à jour du pointage :', error);
-        }
-      );
-    } else {
-      this.showErrorModal();
+  
+  isHeureDeRetard(heureArrivee: string, heureLimite: string): boolean {
+    // Convertir l'heure dans un format 24h pour la comparaison
+    const [heureArriveeHeures, heureArriveeMinutes] = heureArrivee.split(":").map(Number);
+    const [heureLimiteHeures, heureLimiteMinutes] = heureLimite.split(":").map(Number);
+  
+    if (heureArriveeHeures > heureLimiteHeures || (heureArriveeHeures === heureLimiteHeures && heureArriveeMinutes > heureLimiteMinutes)) {
+      return true; // Retard
     }
+    return false; // Pas de retard
+  }
+  
+  
+// Modifier la fonction confirmSecondPointage pour récupérer le tableau de cardIds
+confirmSecondPointage() {
+  const cardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
+  if (!cardIds || !cardIds.includes(this.formData.cardId)) {
+    console.error('Le cardId n\'est pas trouvé dans le localStorage');
+    return; // Vous pouvez gérer cette erreur comme vous le souhaitez
+  }
+
+  const heureDepart = this.formatTime(new Date());
+  const pointageData: any = { heure_depart: heureDepart };
+
+  this.utilisateurService.updatePointage(this.formData.cardId, pointageData).subscribe(
+    (response) => {
+      console.log('Pointage mis à jour :', response);
+      
+      // Supprimer le cardId du localStorage après le deuxième pointage
+      const updatedCardIds = cardIds.filter((id: string) => id !== this.formData.cardId);
+      localStorage.setItem('cardIds', JSON.stringify(updatedCardIds));
+      
+      this.showSuccessModal();
+    },
+    (error) => {
+      console.error('Erreur lors de la mise à jour du pointage :', error);
+    }
+  );
+}
+  
+
+  rejectPointage() {
+    const pointageData: any = {
+      carte_id: this.formData.cardId,
+      nom: this.formData.name,
+      prenom: this.formData.prenom,
+      heure_arrivee: null,
+      heure_depart: null,
+      statut: 'rejeter',
+    };
+
+    this.utilisateurService.createPointage(pointageData).subscribe(
+      (response) => {
+        console.log('Pointage rejeté :', response);
+        this.showErrorModal();
+      },
+      (error) => {
+        console.error('Erreur lors du rejet du pointage :', error);
+      }
+    );
   }
 
   showSuccessModal() {
@@ -205,12 +253,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
   }
 
   onReject() {
-    console.log('Rejeté');
-    alert('Formulaire rejeté.');
-    this.showForm = false;
-    this.showImage = false;
-    this.showUserSection = false;
-    this.showProcessSection = true;
+    this.rejectPointage();
   }
 
   updateDateTime() {

@@ -1,15 +1,18 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { Route } from '@angular/router';
 
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
-  imports: [RouterLink, RouterLinkActive],
+  standalone : true,
+  imports: [RouterLink, RouterLinkActive,RouterModule],
 
 })
 export class SidebarComponent {
+  router: any;
   // constructor(private router: Router) {}
 
   // // Fonction pour rediriger vers Dashboard
@@ -45,9 +48,12 @@ export class SidebarComponent {
   //   this.router.navigate(['/historique']);
   // }
 
-  // logout(){
+  logout(){
 
-  //   this.router.navigate(['/login']);
-  // }
+    this.router.navigate(['/login']);
+  }
+  
 
 }
+
+

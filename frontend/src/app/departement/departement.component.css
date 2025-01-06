@@ -54,3 +54,27 @@
     border-color: #ddd;
   }
   
+  .btn-light-green {
+    background-color: #4CAF50; /* Couleur vert clair */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  
+  .btn-light-green:hover {
+    background-color: #45a049; /* Couleur vert foncé au survol */
+  }
+  
+  .card-body.text-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  

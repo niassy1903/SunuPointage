@@ -12,6 +12,10 @@ import { InscriptionComponent } from './inscription/inscription.component';
 import { EditComponent } from './edit/edit.component';
 import { AddDepartementComponent } from './add-departement/add-departement.component';
 import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
+import { AddCohorteComponent } from './add-cohorte/add-cohorte.component';
+import { EditCohorteComponent } from './edit-cohorte/edit-cohorte.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { ApprenantListCohorteComponent } from './apprenant-list-cohorte/apprenant-list-cohorte.component';
 
 
 
@@ -32,6 +36,11 @@ export const routes: Routes = [
     { path: 'edit/:id', component: EditComponent },
     {path:'add-departement', component: AddDepartementComponent},
     {path:'dashboard-vigile', component: DashboardVigileComponent},
+    {path:'add-cohorte',component:AddCohorteComponent},
+    { path: 'edit-cohorte/:id', component: EditCohorteComponent },
+    { path: 'employee-list/:id', component: EmployeeListComponent },
+    { path: 'departements/:departmentName/employees', component: EmployeeListComponent },
+    { path: 'cohortes/:cohorteName/apprenants', component: ApprenantListCohorteComponent },
 
 
 ];

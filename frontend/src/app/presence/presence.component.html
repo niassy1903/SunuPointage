@@ -24,6 +24,10 @@
     <button class="btn btn-primary d-flex align-items-center mb-2" (click)="markAbsentUsers()">
       <i class="bi bi-check-circle mr-2"></i> Valider multiple
     </button>
+
+    <button class="btn btn-warning d-flex align-items-center mb-2" (click)="openConfirmationModal()">
+      <i class="bi bi-save mr-2"></i> Enregistrer les modifications
+    </button>
   </div>
 
   <div class="table-responsive">
@@ -38,7 +42,9 @@
           <th>Arrivée</th>
           <th>Départ</th>
           <th>Temps de travail</th>
-          <th>Absent</th>
+          <th>
+            <input type="checkbox" (change)="toggleAllAbsent($event)">
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -54,7 +60,7 @@
           <td>{{ presence.heure_depart || '--' }}</td>
           <td>{{ calculateWorkTime(presence.heure_arrivee, presence.heure_depart) || '--' }}</td>
           <td>
-            <input type="checkbox" [(ngModel)]="presence.isChecked" [disabled]="presence.statut === 'present'" />
+            <input type="checkbox" [(ngModel)]="presence.isChecked" [disabled]="presence.statut !== 'Absent'" />
           </td>
         </tr>
       </tbody>
@@ -76,5 +82,24 @@
         </li>
       </ul>
     </nav>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Êtes-vous sûr de vouloir enregistrer les modifications ?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non</button>
+          <button type="button" class="btn btn-primary" (click)="saveChanges()">Oui</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,0 +1,33 @@
+.container {
+    max-width: 960px;
+  }
+  
+  .table th {
+    background-color: #f8f9fa;
+  }
+  
+  .pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: default;
+    background-color: #fff;
+    border-color: #dee2e6;
+  }
+  
+  .badge-success {
+    background-color: #28a745;
+  }
+  
+  .badge-danger {
+    background-color: #dc3545;
+  }
+  
+  .badge-warning {
+    background-color: #ffc107;
+  }
+  

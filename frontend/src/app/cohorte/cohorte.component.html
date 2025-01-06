@@ -1,6 +1,3 @@
-<app-sidebar></app-sidebar>
-<app-navbar></app-navbar>
-
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -11,7 +8,7 @@
 
   <div class="row">
     <div class="col-md-3 mb-4" *ngFor="let cohorte of getPaginatedCohortes(); let i = index">
-      <div class="card text-center">
+      <div class="card text-center" (click)="viewCohorte(cohorte.name)" style="cursor: pointer;">
         <div class="card-img-container">
           <img src="/images/cohorte.png" class="card-img-top rounded-circle mx-auto mt-3" alt="Cohorte Image" width="100" height="100">
         </div>
@@ -19,11 +16,10 @@
           <h5 class="card-title">{{ cohorte.name }}</h5>
           <p class="card-text">{{ cohorte.description }}</p>
           <p class="card-text"><strong>Apprenants: {{ cohorte.capacity }}</strong></p>
-
-          <div class="d-flex justify-content-center">
-            <button class="btn btn-sm btn-outline-success me-2" (click)="editCohorte(cohorte)"><i class="fas fa-edit"></i></button>
-            <button class="btn btn-sm btn-outline-danger" (click)="deleteCohorte(cohorte)"><i class="fas fa-trash"></i></button>
-          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <button class="btn btn-sm btn-outline-success me-2" (click)="stopPropagation($event); editCohorte(cohorte)"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm btn-outline-danger" (click)="stopPropagation($event); deleteCohorte(cohorte)"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>
@@ -48,5 +44,43 @@
         </li>
       </ul>
     </nav>
+  </div>
+</div>
+
+<!-- Modal pour supprimer une cohorte avec apprenants -->
+<div id="deleteWithApprenantsModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette cohorte avec ses apprenants ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteWithApprenants()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour supprimer une cohorte sans apprenants -->
+<div id="deleteWithoutApprenantsModal" class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer cette cohorte sans apprenants ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteWithoutApprenants()">Confirmer</button>
+      </div>
+    </div>
   </div>
 </div>

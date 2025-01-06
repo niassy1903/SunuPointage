@@ -16,7 +16,7 @@
           <h5 class="card-title">{{ department.nom }}</h5>
           <p class="card-text">Créé en : {{ department.annee_creation | date: 'yyyy' }}</p>
           <p class="card-text">Année académique : {{ department.academicYear }}</p>
-         
+          <button class="btn btn-light-green" (click)="viewDepartment(department)">Voir les employés</button>
         </div>
       </div>
     </div>
@@ -42,6 +42,4 @@
       </ul>
     </nav>
   </div>
-
- 
 </div>

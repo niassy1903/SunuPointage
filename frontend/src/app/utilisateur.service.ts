@@ -57,6 +57,11 @@ export class UtilisateurService {
     return this.http.get(`${this.apiUrl1}/employers/${encodeURIComponent(departmentName)}`);
   }
 
+  getListeApprenantsByCohorte(cohorte: string): Observable<any> {
+    const encodedCohorte = encodeURIComponent(cohorte);
+    return this.http.get<any>(`${this.apiUrl1}/utilisateurs/liste-apprenants-par-cohorte/${encodedCohorte}`);
+  }
+
   getApprenantsByCohorte(cohorte: string): Observable<any> {
     const encodedCohorte = encodeURIComponent(cohorte);
     return this.http.get<any>(`${this.apiUrl1}/utilisateurs/apprenants-par-cohorte/${encodedCohorte}`);
@@ -111,15 +116,25 @@ export class UtilisateurService {
     );
   }
 
-  updatePointage(id: string, pointageData: any): Observable<any> {
-    const url = `${this.apiUrl1}/pointages/${id}`;
+  updatePointage(carte_id: string, pointageData: any): Observable<any> {
+    const url = `${this.apiUrl1}/pointages/${carte_id}`;
     return this.http.put<any>(url, pointageData).pipe(
         tap(response => console.log('Pointage updated:', response))
     );
 }
 
+
     // Récupérer les informations de pointage par carte ID
     getPointageByCardId(cardId: string): Observable<any> {
       return this.http.get<any>(`${this.apiUrl1}/pointage/${cardId}`);
     }
+
+    createPointagesBatch(pointagesData: any[]): Observable<any> {
+      const url = `${this.apiUrl1}/create-pointage`;
+      return this.http.post<any>(url, pointagesData).pipe(
+        tap(response => console.log('Pointages batch created:', response))
+      );
+    }
+
+    
 }
