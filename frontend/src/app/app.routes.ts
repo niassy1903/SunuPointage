@@ -12,6 +12,8 @@ import { InscriptionComponent } from './inscription/inscription.component';
 import { EditComponent } from './edit/edit.component';
 import { AddDepartementComponent } from './add-departement/add-departement.component';
 import { DashboardVigileComponent } from './dashboard-vigile/dashboard-vigile.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 
@@ -32,6 +34,10 @@ export const routes: Routes = [
     { path: 'edit/:id', component: EditComponent },
     {path:'add-departement', component: AddDepartementComponent},
     {path:'dashboard-vigile', component: DashboardVigileComponent},
+
+    //Réinitilisation de mot de passe
+    {path:'forgot-password', component: ForgotPasswordComponent},
+    { path: 'reset-password', component: ResetPasswordComponent }, // Route pour la réinitialisation
 
 
 ];

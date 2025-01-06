@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { UtilisateurService } from '../utilisateur.service';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { PointageService } from '../pointage.service'; // Import du service PointageService
 
 declare var bootstrap: any;
 
@@ -12,7 +13,7 @@ declare var bootstrap: any;
   imports: [FormsModule, HttpClientModule, CommonModule],
   templateUrl: './dashboard-vigile.component.html',
   styleUrls: ['./dashboard-vigile.component.css'],
-  providers: [UtilisateurService]
+  providers: [UtilisateurService, PointageService],
 })
 export class DashboardVigileComponent implements OnInit, OnDestroy {
   formData = {
@@ -35,7 +36,14 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
   private pointageModal: any;
   isFirstPointageDone: boolean = false;
 
-  constructor(private utilisateurService: UtilisateurService) {}
+  totalPointages: number = 0;
+  totalValidations: number = 0;
+  totalRejets: number = 0;
+  
+  constructor(
+    private utilisateurService: UtilisateurService,
+    private pointageService: PointageService // Injection du service PointageService
+  ) {}
 
   ngOnInit() {
     this.connectWebSocket();
@@ -43,6 +51,9 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     this.intervalId = setInterval(() => {
       this.updateDateTime();
     }, 1000);
+
+    // Appeler les méthodes pour obtenir les données des pointages, validations et rejets
+    this.loadPointagesData();
   }
 
   ngOnDestroy() {
@@ -114,6 +125,40 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       }
     );
   }
+  loadPointagesData() {
+    const today = new Date().toISOString().split('T')[0]; // Format: '2025-01-03'
+
+    // Récupérer le total des pointages
+    this.pointageService.getTotalPointages(today).subscribe(
+      (data) => {
+        this.totalPointages = data.total_pointages; // Mettez à jour la variable totalPointages
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des pointages :', error);
+      }
+    );
+
+    // Récupérer le total des pointages validés
+    this.pointageService.getTotalValidations(today).subscribe(
+      (data) => {
+        this.totalValidations = data.total_validations; // Mettez à jour la variable totalValidations
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des validations :', error);
+      }
+    );
+
+    // Récupérer le total des pointages rejetés
+    this.pointageService.getTotalRejets(today).subscribe(
+      (data) => {
+        this.totalRejets = data.total_rejets; // Mettez à jour la variable totalRejets
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des rejets :', error);
+      }
+    );
+}
+
 
   onSubmit() {
     this.showPointageModal();
@@ -221,6 +266,9 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
 
     this.currentTime = `${hours}:${minutes}:${seconds}`;
     this.currentDate = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Recharger les données des pointages à chaque changement de date
+    this.loadPointagesData();
   }
 
   formatTime(date: Date): string {

@@ -66,6 +66,13 @@
       </form>
     </div>
 
+  <!-- Lien vers Mot de passe oublié -->
+<div class="text-center mt-3">
+  <a routerLink="/forgot-password" class="text-decoration-none">Mot de passe oublié ?</a>
+</div>
+
+
+  <!-- Formulaire de connexion à partir d'une carte -->
     <div *ngIf="showCardInput" class="card-input-container">
       <label for="cardId">Scannez votre carte</label>
       <div class="input-container">
@@ -91,7 +98,7 @@
 </div>
 
 <!-- Modal Bootstrap pour la connexion réussie -->
-<div class="modal fade" id="loginSuccessModal" tabindex="-1" aria-labelledby="loginSuccessModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="loginSuccessModal" tabindex="-1" aria-labelledby="loginSuccessModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content custom-modal">
       <div class="modal-header">
@@ -106,7 +113,7 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- Modal Bootstrap pour l'accès non autorisé -->
 <div class="modal fade" id="unauthorizedModal" tabindex="-1" aria-labelledby="unauthorizedModalLabel" aria-hidden="true">

@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UtilisateurService } from '../utilisateur.service';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../sidebar/sidebar.component';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -25,7 +23,7 @@ interface Presence {
   templateUrl: './presence.component.html',
   styleUrls: ['./presence.component.css'],
   standalone: true,
-  imports: [FormsModule, SidebarComponent, NavbarComponent, CommonModule, HttpClientModule],
+  imports: [FormsModule, CommonModule, HttpClientModule],
   providers: [UtilisateurService],
 })
 export class PresenceComponent implements OnInit {

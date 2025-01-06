@@ -20,7 +20,7 @@ declare var bootstrap: any;
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.css'],
   standalone: true,
-  imports: [SidebarComponent, CommonModule, NavbarComponent, ReactiveFormsModule, HttpClientModule,RouterModule],
+  imports: [ CommonModule, ReactiveFormsModule, HttpClientModule,RouterModule],
   providers: [UtilisateurService, CohorteService, DepartementService]
 })
 export class EditComponent implements OnInit {

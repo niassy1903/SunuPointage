@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { PointageService } from '../pointage.service';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ChartsComponent } from '../component/charts/charts.component';
 
 interface DashboardCard {
@@ -16,15 +20,19 @@ interface DashboardCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [ChartsComponent], // Importation du composant standalone
+  imports: [FormsModule, ChartsComponent, HttpClientModule, CommonModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css'],
+  providers: [PointageService],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+  currentTime: string = new Date().toLocaleTimeString(); // Heure actuelle
+  currentDate: string = new Date().toISOString().split('T')[0]; // Date au format ISO: 'YYYY-MM-DD'
 
-  currentTime = '8:02:09 AM';
-  currentDate = '2 août 2023';
-  
+  totalPointages: number = 0;
+  totalValidations: number = 0;
+  totalRejets: number = 0;
+
   cards: DashboardCard[] = [
     {
       icon: 'bi bi-people',
@@ -34,8 +42,8 @@ export class DashboardComponent {
       trend: {
         value: 2,
         text: 'nouveaux employés !',
-        isPositive: true
-      }
+        isPositive: true,
+      },
     },
     {
       icon: 'bi bi-person-check',
@@ -45,8 +53,8 @@ export class DashboardComponent {
       trend: {
         value: 10,
         text: 'Moins qu\'hier',
-        isPositive: false
-      }
+        isPositive: false,
+      },
     },
     {
       icon: 'bi bi-person-x',
@@ -56,8 +64,8 @@ export class DashboardComponent {
       trend: {
         value: 3,
         text: 'Augmentation par rapport à hier',
-        isPositive: false
-      }
+        isPositive: false,
+      },
     },
     {
       icon: 'bi bi-clock-history',
@@ -67,8 +75,8 @@ export class DashboardComponent {
       trend: {
         value: 13,
         text: 'Augmentation par rapport à hier',
-        isPositive: false
-      }
+        isPositive: false,
+      },
     },
     {
       icon: 'bi bi-box-arrow-right',
@@ -78,8 +86,8 @@ export class DashboardComponent {
       trend: {
         value: 10,
         text: 'Moins qu\'hier',
-        isPositive: true
-      }
+        isPositive: true,
+      },
     },
     {
       icon: 'bi bi-clock',
@@ -89,8 +97,34 @@ export class DashboardComponent {
       trend: {
         value: 2,
         text: 'Augmentation par rapport à hier',
-        isPositive: false
-      }
-    }
+        isPositive: false,
+      },
+    },
   ];
+
+  constructor(private pointageService: PointageService) {}
+
+  ngOnInit() {
+    // Appel de la méthode pour récupérer les statistiques des pointages par statut
+    this.getPointageStatistics(this.currentDate);
+  }
+
+  getPointageStatistics(date: string) {
+    this.pointageService.getPointageStatistics(date).subscribe((data) => {
+      console.log('Données reçues de l\'API:', data); // Affichez les données dans la console
+      this.updateCardValue('Total Employees', data['total_employes']);
+      this.updateCardValue('A l\'heure', data['present']);
+      this.updateCardValue('Absent', data['absent']);
+      this.updateCardValue('Arrivée tardive', data['retard']);
+      this.updateCardValue('Départs anticipés', data['depart_anticipé']);
+      this.updateCardValue('Départs Tardives', data['depart_tardif']);
+    });
+  }
+  updateCardValue(cardTitle: string, value: number) {
+    const card = this.cards.find((c) => c.title === cardTitle);
+    if (card) {
+      card.value = value;
+    }
+  }
+  
 }

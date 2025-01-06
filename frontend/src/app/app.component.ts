@@ -24,8 +24,8 @@ export class AppComponent {
     // Détection des changements de route
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        // Masquer le layout sur la page de connexion
-        this.showLayout = event.url !== '/' && event.url !== '/login';
+        // Masquer le layout sur la page de connexion et de mot de passe oublié
+        this.showLayout = event.url !== '/' && event.url !== '/login' && event.url !== '/forgot-password' && event.url !== '/reset-password';
       }
     });
   }

@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { SidebarComponent } from '../sidebar/sidebar.component';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CohorteService } from '../cohorte.service'; // Service des cohortes
 import { UtilisateurService } from '../utilisateur.service'; // Service des utilisateurs
@@ -18,7 +16,7 @@ interface Cohorte {
   templateUrl: './cohorte.component.html',
   styleUrls: ['./cohorte.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule, SidebarComponent, NavbarComponent, HttpClientModule],
+  imports: [FormsModule, CommonModule, HttpClientModule],
   providers: [CohorteService, UtilisateurService], // Ajouter les deux services ici
 })
 export class CohorteComponent implements OnInit {

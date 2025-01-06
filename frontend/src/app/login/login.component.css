@@ -15,6 +15,22 @@
   background-color: #deded4;
 }
 
+/* Les liens de navigation */
+a.router-link {
+  position: relative;
+  z-index: 10; /* Assure-toi que le lien est visible au-dessus des autres éléments */
+}
+
+.text-decoration-none {
+  color: #8DBB36; /* Change la couleur si nécessaire */
+  text-decoration: none;
+}
+
+.text-decoration-none:hover {
+  text-decoration: underline;
+}
+
+
 /* Formulaire centré */
 .login-container {
   max-width: 800px;
