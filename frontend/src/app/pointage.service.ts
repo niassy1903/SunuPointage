@@ -1,25 +1,71 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PointageService {
-  private apiUrl = 'http://localhost:8000/api/pointages'; // Remplacez par l'URL de votre API Laravel
+  private apiUrl = 'http://localhost:8000/api'; // Remplacez par l'URL de votre API Laravel
 
   constructor(private http: HttpClient) {}
 
-  // Méthode pour récupérer les pointages
-  getPointages(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  // Récupérer tous les pointages
+  getAllPointages(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/pointages`);
   }
 
   // Méthode pour mettre à jour le statut de pointage
   updatePointageStatus(cardId: string, status: string): Observable<any> {
-    const url = `${this.apiUrl}/update-status/${cardId}`;
+    const url = `${this.apiUrl}/pointages/update-status/${cardId}`;
     const body = { statut: status };  // Le corps de la requête contient le statut
 
     return this.http.put<any>(url, body);  // Envoie la requête PUT
+  }
+
+  // Récupérer un pointage spécifique par ID
+  getPointageById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/pointages/${id}`);
+  }
+
+  // Récupérer un pointage par carte ID
+  getPointageByCardId(cardId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/pointage/${cardId}`);
+  }
+
+  // Récupérer le total des pointages par jour
+  getTotalPointages(date?: string): Observable<any> {
+    // Utilisez l'URL modifiée pour accepter la date dans l'URL
+    const url = date ? `${this.apiUrl}/pointages/totals/${date}` : `${this.apiUrl}/pointages/totals`;
+    return this.http.get(url);
+  }
+
+  // Récupérer le total des pointages validés par jour
+  getTotalValidations(date?: string): Observable<any> {
+    // Utilisez l'URL modifiée pour accepter la date dans l'URL
+    const url = date ? `${this.apiUrl}/pointages/validations/${date}` : `${this.apiUrl}/pointages/validations`;
+    return this.http.get(url);
+  }
+
+  // Récupérer le total des pointages rejetés par jour
+  getTotalRejets(date?: string): Observable<any> {
+    // Utilisez l'URL modifiée pour accepter la date dans l'URL
+    const url = date ? `${this.apiUrl}/pointages/rejets/${date}` : `${this.apiUrl}/pointages/rejets`;
+    return this.http.get(url);
+  }
+
+  // Ajouter un nouveau pointage
+  createPointage(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/pointages`, data);
+  }
+
+  // Mettre à jour un pointage existant
+  updatePointage(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/pointages/${id}`, data);
+  }
+  
+  // Récupérer les statistiques des pointages par statut pour une date spécifique
+  getPointageStatistics(date: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/pointages/statistiques/${date}`);
   }
 }

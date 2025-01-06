@@ -26,45 +26,49 @@
             required
           />
         </div>
-      </div>
 
-      <!-- Champ Mot de passe -->
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <div class="input-container">
-          <i class="bi bi-lock"></i>
-          <input
-            type="password"
-            id="password"
-            placeholder="Entrer votre mot de passe"
-            [(ngModel)]="password"
-            name="password"
-            required
-          />
-          <i class="bi bi-eye" (click)="togglePassword()"></i>
+        <!-- Champ Mot de passe -->
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <div class="input-container">
+            <i class="bi bi-lock"></i>
+            <input
+              type="password"
+              id="password"
+              placeholder="Entrer votre mot de passe"
+              [(ngModel)]="password"
+              name="password"
+              required
+            />
+            <i class="bi bi-eye" (click)="togglePassword()"></i>
+          </div>
+          <div *ngIf="errorMessage === 'Accès non autorisé'" class="error-message">
+            Accès non autorisé
+          </div>
         </div>
-        <div *ngIf="errorMessage === 'Accès non autorisé'" class="error-message">
-          Accès non autorisé
+
+        <!-- Message d'erreur -->
+        <div *ngIf="errorMessage && errorMessage !== 'Accès non autorisé'" class="error-message">
+          {{ errorMessage }}
         </div>
-      </div>
 
-      <!-- Message d'erreur -->
-      <div *ngIf="errorMessage && errorMessage !== 'Accès non autorisé'" class="error-message">
-        {{ errorMessage }}
-      </div>
+        <!-- Message de succès -->
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
 
-      <!-- Message de succès -->
-      <div *ngIf="successMessage" class="success-message">
-        {{ successMessage }}
+        <!-- Bouton de connexion -->
+        <button type="submit" class="btn-login">
+          Se connecter <i class="bi bi-arrow-right"></i>
+        </button>
       </div>
-
-      <!-- Bouton de connexion -->
-      <button type="submit" class="btn-login">
-        Se connecter <i class="bi bi-arrow-right"></i>
-      </button>
-    </form>
+      </form>
   </div>
 
+  <!-- Lien vers Mot de passe oublié -->
+<div class="text-center mt-3">
+  <a routerLink="/forgot-password" class="text-decoration-none">Mot de passe oublié ?</a>
+</div>
   <!-- Pied de page -->
   <footer class="footer">
     <p>&copy; 2024 SunuPointage. Tous droits réservés.</p>

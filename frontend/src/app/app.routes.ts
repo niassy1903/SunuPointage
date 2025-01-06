@@ -16,6 +16,8 @@ import { AddCohorteComponent } from './add-cohorte/add-cohorte.component';
 import { EditCohorteComponent } from './edit-cohorte/edit-cohorte.component';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
 import { ApprenantListCohorteComponent } from './apprenant-list-cohorte/apprenant-list-cohorte.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 
@@ -41,6 +43,10 @@ export const routes: Routes = [
     { path: 'employee-list/:id', component: EmployeeListComponent },
     { path: 'departements/:departmentName/employees', component: EmployeeListComponent },
     { path: 'cohortes/:cohorteName/apprenants', component: ApprenantListCohorteComponent },
+
+    //Réinitilisation de mot de passe
+    {path:'forgot-password', component: ForgotPasswordComponent},
+    { path: 'reset-password', component: ResetPasswordComponent }, // Route pour la réinitialisation
 
 
 ];

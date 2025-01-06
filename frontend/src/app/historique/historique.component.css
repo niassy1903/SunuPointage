@@ -32,4 +32,21 @@
   .historique-container .pagination .page-link {
     color: var(--custom-color);
   }
+  .table {
+    margin-top: 20px;
+    color: black;
+  }
+  
+  .table th {
+    cursor: pointer;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .table-light {
+    background-color: #f8f9fa;
+  }
+
   

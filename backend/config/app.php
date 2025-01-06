@@ -40,6 +40,9 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
+    
+    App\Providers\AppServiceProvider::class,
+    MongoDB\Laravel\MongoDBServiceProvider::class, 
 
     /*
     |--------------------------------------------------------------------------

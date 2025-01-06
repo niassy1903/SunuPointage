@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { UtilisateurService } from '../utilisateur.service';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { PointageService } from '../pointage.service'; // Import du service PointageService
 
 declare var bootstrap: any;
 
@@ -12,7 +13,7 @@ declare var bootstrap: any;
   imports: [FormsModule, HttpClientModule, CommonModule],
   templateUrl: './dashboard-vigile.component.html',
   styleUrls: ['./dashboard-vigile.component.css'],
-  providers: [UtilisateurService]
+  providers: [UtilisateurService, PointageService],
 })
 export class DashboardVigileComponent implements OnInit, OnDestroy {
   formData = {
@@ -36,7 +37,14 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
   isFirstPointageDone: boolean = false;
   private ws: WebSocket | null = null; // Initialiser avec null
 
-  constructor(private utilisateurService: UtilisateurService) {}
+  totalPointages: number = 0;
+  totalValidations: number = 0;
+  totalRejets: number = 0;
+  
+  constructor(
+    private utilisateurService: UtilisateurService,
+    private pointageService: PointageService // Injection du service PointageService
+  ) {}
 
   ngOnInit() {
     this.connectWebSocket();
@@ -44,6 +52,9 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     this.intervalId = setInterval(() => {
       this.updateDateTime();
     }, 1000);
+
+    // Appeler les méthodes pour obtenir les données des pointages, validations et rejets
+    this.loadPointagesData();
   }
 
   ngOnDestroy() {
@@ -103,17 +114,86 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     );
   }
   
-  checkPointageStatus(cardId: string) {
+  checkPointageStatus(cardId: string): void {
+    // Vérification initiale dans le localStorage
     const storedCardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
-    
+  
     if (storedCardIds.includes(cardId)) {
-      // Ce cardId a déjà été pointé (il est stocké dans localStorage)
+      // Le cardId est déjà enregistré localement
       this.isFirstPointageDone = true;
+      this.pointageId = null; // Pas besoin d'ID de pointage dans ce cas
     } else {
-      // C'est un premier pointage
-      this.isFirstPointageDone = false;
+      // Si non trouvé dans localStorage, vérifier via l'API
+      this.utilisateurService.getPointageByCardId(cardId).subscribe(
+        (response) => {
+          if (response && response.heure_depart === null) {
+            // Un pointage existe et n'est pas encore terminé
+            this.pointageId = response.id;
+            this.isFirstPointageDone = true;
+          } else {
+            // Aucun pointage actif trouvé
+            this.pointageId = null;
+            this.isFirstPointageDone = false;
+          }
+        },
+        (error) => {
+          console.error('Erreur lors de la récupération du pointage :', error);
+          this.pointageId = null;
+          this.isFirstPointageDone = false;
+        }
+      );
     }
   }
+  
+  loadPointagesData(): void {
+    const today = new Date().toISOString().split('T')[0]; // Format: 'YYYY-MM-DD'
+  
+    // Charger le total des pointages
+    this.pointageService.getTotalPointages(today).subscribe(
+      (data) => {
+        this.totalPointages = data.total_pointages; // Mise à jour du total
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des pointages :', error);
+      }
+    );
+  
+    // Charger le total des pointages validés
+    this.pointageService.getTotalValidations(today).subscribe(
+      (data) => {
+        this.totalValidations = data.total_validations; // Mise à jour des validations
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des validations :', error);
+      }
+    );
+  
+    // Charger le total des pointages rejetés
+    this.pointageService.getTotalRejets(today).subscribe(
+      (data) => {
+        this.totalRejets = data.total_rejets; // Mise à jour des rejets
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des rejets :', error);
+      }
+    );
+  }
+  
+  onSubmit(): void {
+    // Afficher le modal de pointage lors de la soumission
+    this.showPointageModal();
+  }
+  
+  showPointageModal(): void {
+    const modalElement = document.getElementById('pointageModal');
+    if (modalElement) {
+      this.pointageModal = new bootstrap.Modal(modalElement);
+      this.pointageModal.show();
+    } else {
+      console.error('Modal de pointage non trouvé dans le DOM.');
+    }
+  }
+  
   
   confirmPointage() {
     const storedCardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
@@ -264,6 +344,9 @@ confirmSecondPointage() {
 
     this.currentTime = `${hours}:${minutes}:${seconds}`;
     this.currentDate = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Recharger les données des pointages à chaque changement de date
+    this.loadPointagesData();
   }
 
   formatTime(date: Date): string {

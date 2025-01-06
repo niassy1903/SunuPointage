@@ -4,67 +4,37 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Utilisateur;
+use Illuminate\Support\Str;
 
 class UtilisateurSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
-        $prenoms = [
-            "Amadou", "Mamadou", "Cheikh", "Ibrahima", "El Hadji",
-            "Modou", "Moustapha", "Aliou", "Serigne", "Boubacar",
-            "Aminata", "Adama", "Fatou", "Mariama", "Coumba",
-            "Awa", "Sokhna", "Astou", "Bineta", "Khady"
-        ];
+        $faker = \Faker\Factory::create();
 
-        $noms = [
-            "Sarr", "Ndiaye", "Sow", "Faye", "Kane",
-            "Ba", "Gueye", "Diatta", "Seck", "Thiam",
-            "Niang", "Camara", "Mbaye", "Touré", "Diallo", "Sy",
-            "Fall", "Diop", "Diouf", "Ngom", "Mbengue",
-            "Diagne", "Ndoye", "Ndour", "Sène", "Guèye",
-            "Badji", "Cissé", "Dia", "Ka", "Lô",
-            "Mbodj", "Ndiaye", "Niane", "Samb", "Traoré"
-        ];
-
-
-     
-
-        $adresses = [
-            "Dakar", "Keur Massar", "Almadies", "Ngor", "Rufisque"
-        ];
+        $fonctions = ['apprenant', 'vigile', 'admin', 'employer'];
+        $departements = ['IT', 'Marketing', 'Finance', 'RH', 'Opérations'];
+        $cohortes = ['Cohorte 1', 'Cohorte 2', 'Cohorte 3'];
 
         for ($i = 0; $i < 50; $i++) {
-            $prenom = $prenoms[array_rand($prenoms)];
-            $nom = $noms[array_rand($noms)];
-            $email = strtolower("$prenom.$nom@gmail.com");
-            $adresse = $adresses[array_rand($adresses)];
-            $matricule = $this->generateMatricule($i);
-
             Utilisateur::create([
-                'nom' => $nom,
-                'prenom' => $prenom,
-                'email' => $email,
-                'adresse' => $adresse,
-                'telephone' => '773862943',
-                'fonction' => 'vigile',
-                
-                'mot_de_passe' => bcrypt('password'), // Assurez-vous de hacher le mot de passe
-               
-                'card_id' => 'CARD' . str_pad($i + 1, 4, '0', STR_PAD_LEFT), // Générer un card_id unique
-                'matricule' => $matricule // Générer un matricule unique
+                'nom' => $faker->lastName,
+                'prenom' => $faker->firstName,
+                'email' => $faker->unique()->safeEmail,
+                'adresse' => $faker->address,
+                'telephone' => $faker->unique()->phoneNumber,
+                'fonction' => $faker->randomElement($fonctions),
+                'photo' => $faker->imageUrl(100, 100, 'people'),
+                'mot_de_passe' => 'password123', // Le mot de passe sera automatiquement haché
+                'departement' => $faker->randomElement($departements),
+                'cohorte' => $faker->randomElement($cohortes),
+                'matricule' => strtoupper(Str::random(8)),
+                'status' => $faker->randomElement(['actif', 'inactif']),
+                'card_id' => strtoupper(Str::random(10)),
             ]);
         }
-    }
-
-    protected function generateMatricule($index)
-    {
-        $year = date('Y');
-        $number = $index + 1;
-        return "MATRICULE-{$year}-" . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 }
