@@ -35,12 +35,25 @@ return [
     |
     */
 
+
+
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
     ],
+
+    'api' => [
+        'driver' => 'passport', // Si vous utilisez Laravel Passport pour l'authentification API
+        'provider' => 'users',
+    ],
+
+    'jwt' => [
+        'driver' => 'jwt', // Assurez-vous que le driver soit 'jwt'
+        'provider' => 'users',
+    ],
+],
+
 
     /*
     |--------------------------------------------------------------------------

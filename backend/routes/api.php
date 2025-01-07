@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -9,101 +10,54 @@ use App\Http\Controllers\CohorteController;
 use App\Http\Controllers\PointageController;
 use App\Http\Controllers\HistoricPointageController;
 
-
-
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-//Réinitialized Password Controller with email
+// Routes publiques (non sécurisées)
+Route::post('login', [UtilisateurController::class, 'login']);
+Route::post('login-by-card', [UtilisateurController::class, 'loginByCardId']);
+Route::get('check-card-id/{cardId}', [UtilisateurController::class, 'checkCardIdExists']);
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('password/reset', [ForgotPasswordController::class, 'resetPassword']);
 
-Route::get('/utilisateurs/card/{cardId}', [UtilisateurController::class, 'getUtilisateurByCardId']);
+// Toutes les autres routes nécessitent une authentification JWT
+Route::middleware(['jwt.auth'])->group(function () {
+    // Route pour obtenir l'utilisateur connecté
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
+    // Routes liées aux utilisateurs
+    Route::get('/utilisateurs/card/{cardId}', [UtilisateurController::class, 'getUtilisateurByCardId']);
+    Route::apiResource('utilisateurs', UtilisateurController::class);
+    Route::get('employers/{departement}', [UtilisateurController::class, 'getEmployersByDepartment']);
+    Route::get('/utilisateurs/apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getApprenantsByCohorte']);
+    Route::get('/utilisateurs/liste-apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getListeApprenantsByCohorte']);
+    Route::post('/assign-card', [UtilisateurController::class, 'assignCard']);
+    Route::patch('/utilisateurs/{id}/bloquer', [UtilisateurController::class, 'bloquer']);
+    Route::get('/telephones/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
 
-// Route pour récupérer tous les pointages
-Route::get('/pointages', [PointageController::class, 'index']);
+    // Routes liées aux pointages
+    Route::get('/pointages', [PointageController::class, 'index']);
+    Route::get('/pointages/{id}', [PointageController::class, 'show']);
+    Route::post('/pointages', [PointageController::class, 'store']);
+    Route::put('/pointages/{id}', [PointageController::class, 'update']);
+    Route::get('/pointage/{cardId}', [PointageController::class, 'getPointageByCardId']);
+    Route::get('/pointages/totals/{date}', [PointageController::class, 'getTotalPointages']);
+    Route::get('/pointages/validations/{date}', [PointageController::class, 'getTotalValidations']);
+    Route::get('/pointages/rejets/{date}', [PointageController::class, 'getTotalRejets']);
+    Route::get('/pointages/statistiques/{date}', [PointageController::class, 'getStatistiquesPointages']);
+    Route::post('/create-pointage', [PointageController::class, 'createPointage']);
 
-// Route pour récupérer un pointage spécifique par ID
-Route::get('/pointages/{id}', [PointageController::class, 'show']);
+    // Routes liées à HistoricPointage
+    Route::prefix('historic-pointages')->group(function () {
+        Route::get('/', [HistoricPointageController::class, 'index']);
+        Route::post('/', [HistoricPointageController::class, 'store']);
+        Route::get('/{id}', [HistoricPointageController::class, 'show']);
+        Route::put('/{id}', [HistoricPointageController::class, 'update']);
+        Route::delete('/{id}', [HistoricPointageController::class, 'destroy']);
+    });
 
-// Route pour créer un pointage
-Route::post('/pointages', [PointageController::class, 'store']);
+    // Routes liées aux départements et cohortes
+    Route::apiResource('departements', DepartementController::class);
+    Route::apiResource('cohortes', CohorteController::class);
 
-// Route pour mettre à jour un pointage
-Route::put('/pointages/{id}', [PointageController::class, 'update']);
-
-Route::get('/pointage/{cardId}', [PointageController::class, 'getPointageByCardId']);
-
-
-
-// Récupérer le total des pointages par jour (avec une date spécifique)
-Route::get('/pointages/totals/{date}', [PointageController::class, 'getTotalPointages']);
-
-// Récupérer le total des pointages validés par jour (avec une date spécifique)
-Route::get('/pointages/validations/{date}', [PointageController::class, 'getTotalValidations']);
-
-// Récupérer le total des pointages rejetés par jour (avec une date spécifique)
-Route::get('/pointages/rejets/{date}', [PointageController::class, 'getTotalRejets']);
-// Récupérer les statistiques des pointages par statut pour une date spécifique
-Route::get('/pointages/statistiques/{date}', [PointageController::class, 'getStatistiquesPointages']);
-
-
-// Groupe de routes pour les APIs de HistoricPointage
-Route::prefix('historic-pointages')->group(function () {
-    Route::get('/', [HistoricPointageController::class, 'index']); // Lister tous les historiques
-    Route::post('/', [HistoricPointageController::class, 'store']); // Créer un historique
-    Route::get('/{id}', [HistoricPointageController::class, 'show']); // Voir un historique spécifique
-    Route::put('/{id}', [HistoricPointageController::class, 'update']); // Mettre à jour un historique
-    Route::delete('/{id}', [HistoricPointageController::class, 'destroy']); // Supprimer un historique
 });
 
-
-
-Route::apiResource('utilisateurs', UtilisateurController::class);
-
-
-Route::get('employers/{departement}', [UtilisateurController::class, 'getEmployersByDepartment']);
-
-
-
-Route::get('/utilisateurs/apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getApprenantsByCohorte']);
-Route::get('/utilisateurs/liste-apprenants-par-cohorte/{cohorte}', [UtilisateurController::class, 'getListeApprenantsByCohorte']);
-
-
-Route::post('/assign-card', [UtilisateurController::class, 'assignCard']);
-
-
-
-
-Route::post('login', [UtilisateurController::class, 'login']);
-// Dans api.php
-
-Route::post('login-by-card', [UtilisateurController::class, 'loginByCardId']);
-
-
-// Ajoutez cette route pour vérifier l'existence de la carte
-Route::get('check-card-id/{cardId}', [UtilisateurController::class, 'checkCardIdExists']);
-
-
-
-
-
-Route::apiResource('departements', DepartementController::class);
-Route::apiResource('cohortes', CohorteController::class);
-
-// routes/api.php
-Route::patch('/utilisateurs/{id}/bloquer', [UtilisateurController::class, 'bloquer']);
-
-Route::get('/telephones/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
-
-
-
-
-
-
-
-
-Route::post('/create-pointage', [PointageController::class, 'createPointage']);

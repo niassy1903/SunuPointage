@@ -32,15 +32,16 @@ return [
  'connections' => [
     // Autres connexions...
     
+
     'mongodb' => [
-        'driver'   => 'mongodb',
-        'host'     => env('MONGO_DB_HOST', '127.0.0.1'),
-        'port'     => env('MONGO_DB_PORT', 27017),
-        'database' => env('MONGO_DB_DATABASE'),
-        'username' => env('MONGO_DB_USERNAME'),
-        'password' => env('MONGO_DB_PASSWORD'),
-        'options'  => [
-            'database' => env('MONGO_DB_DATABASE'), // spécifier la base de données
+        'driver' => 'mongodb',
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', 27017),
+        'database' => env('DB_DATABASE', 'sunupointage'),
+        'username' => env('DB_USERNAME', 'ndiawar'),
+        'password' => env('DB_PASSWORD', 'yaneFaye;79Pi'),
+        'options' => [
+            'database' => env('DB_AUTHENTICATION_DATABASE', 'admin'), // Base de données utilisée pour l'authentification
         ],
     ],
 

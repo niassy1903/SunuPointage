@@ -50,6 +50,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Personal Access Token Model
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the fully qualified class name of the personal
+    | access token model that should be used by Sanctum to manage access
+    | tokens. This model should extend the default model provided by
+    | Sanctum and implement its required methods.
+    |
+    */
+
+    'personal_access_token_model' => App\Models\PersonalAccessToken::class, // Ajout de cette ligne
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Token Prefix
     |--------------------------------------------------------------------------
     |

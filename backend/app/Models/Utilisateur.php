@@ -7,11 +7,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 
 class Utilisateur extends Model implements CanResetPassword
 {
-    use Notifiable, CanResetPasswordTrait;
+    use Notifiable, HasApiTokens, CanResetPasswordTrait;
 
     // Connexion à MongoDB
     protected $connection = 'mongodb';

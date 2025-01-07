@@ -6,6 +6,9 @@ use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Services\JwtService;
 
 class UtilisateurController extends Controller
 {
@@ -26,41 +29,121 @@ class UtilisateurController extends Controller
     return response()->json(['utilisateur' => $utilisateur], 200);
 }
 
+protected $jwtService;
 
+// Injection du service JwtService via le constructeur
+public function __construct(JwtService $jwtService)
+{
+    $this->jwtService = $jwtService;
+}
 
-    public function loginByCardId(Request $request)
-    {
-        Log::info('Card ID reçu : ' . $request->card_id);
+public function loginByCardId(Request $request)
+{
+    // Valider la présence du card_id dans la requête
+    $request->validate([
+        'card_id' => 'required|string',
+    ]);
 
-        // Recherche de l'utilisateur avec le card_id dans la collection MongoDB
-        $utilisateur = Utilisateur::where('card_id', $request->card_id)->first();
+    Log::info('Card ID reçu : ' . $request->card_id);
 
-        if (!$utilisateur) {
-            return response()->json(['message' => 'Carte ID non trouvée'], 404);
-        }
+    // Recherche de l'utilisateur avec le card_id dans la collection MongoDB
+    $utilisateur = Utilisateur::where('card_id', $request->card_id)->first();
 
-        return response()->json(['message' => 'connexion réussie', 'utilisateur' => $utilisateur]);
+    if (!$utilisateur) {
+        return response()->json(['message' => 'Carte ID non trouvée'], 404);
     }
 
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'mot_de_passe' => 'required',
-        ]);
+    // Payload pour le token JWT
+    $payload = [
+        'id' => $utilisateur->id,
+        'email' => $utilisateur->email,
+        'role' => $utilisateur->fonction,
+        'iat' => time(),   // Temps d'émission du token
+        'exp' => time() + 3600, // Expiration dans 1 heure
+    ];
 
-        $utilisateur = Utilisateur::where('email', $request->email)->first();
+    // Générer le token JWT avec la clé secrète
+    $jwt = $this->jwtService->generateToken($payload);
 
-        if (!$utilisateur || !Hash::check($request->mot_de_passe, $utilisateur->mot_de_passe)) {
-            return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
-        }
+    // Retourner la réponse avec le token et les informations de l'utilisateur
+    return response()->json([
+        'message' => 'Connexion réussie avec la carte',
+        'utilisateur' => $utilisateur,
+        'token' => $jwt,
+    ]);
+}
 
-        if (!in_array($utilisateur->fonction, ['admin','vigile'])) {
-            return response()->json(['message' => 'Accès non autorisé'], 403);
-        }
+public function login(Request $request)
+{
+    // Valider la présence de l'email et du mot de passe dans la requête
+    $request->validate([
+        'email' => 'required|email',
+        'mot_de_passe' => 'required',
+    ]);
 
-        return response()->json(['message' => 'Login successful', 'utilisateur' => $utilisateur]);
+    // Recherche de l'utilisateur avec l'email
+    $utilisateur = Utilisateur::where('email', $request->email)->first();
+
+    // Vérifier si l'utilisateur existe et si le mot de passe est correct
+    if (!$utilisateur || !Hash::check($request->mot_de_passe, $utilisateur->mot_de_passe)) {
+        return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
     }
+
+    // Payload pour le token JWT
+    $payload = [
+        'id' => $utilisateur->id,
+        'email' => $utilisateur->email,
+        'role' => $utilisateur->fonction,
+        'iat' => time(),
+        'exp' => time() + 3600, // Expiration dans 1 heure
+    ];
+
+    // Générer le token JWT avec la clé secrète
+    $jwt = $this->jwtService->generateToken($payload);
+
+    // Retourner la réponse avec le token et les informations de l'utilisateur
+    return response()->json([
+        'message' => 'Connexion réussie',
+        'utilisateur' => $utilisateur,
+        'token' => $jwt,
+    ]);
+}
+    // {
+    //     // Valider la présence de l'email et du mot de passe dans la requête
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'mot_de_passe' => 'required',
+    //     ]);
+    
+    //     // Recherche de l'utilisateur avec l'email
+    //     $utilisateur = Utilisateur::where('email', $request->email)->first();
+    
+    //     // Vérifier si l'utilisateur existe et si le mot de passe est correct
+    //     if (!$utilisateur || !Hash::check($request->mot_de_passe, $utilisateur->mot_de_passe)) {
+    //         return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
+    //     }
+    
+    //     // Payload pour le token JWT
+    //     $payload = [
+    //         'id' => $utilisateur->id,
+    //         'email' => $utilisateur->email,
+    //         'role' => $utilisateur->fonction,
+    //         'iat' => time(),
+    //         'exp' => time() + 3600, // Expiration dans 1 heure
+    //     ];
+    
+    //     // Générer le token JWT avec la clé secrète
+    //     $jwt = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
+    
+    //     // Retourner la réponse avec le token et les informations de l'utilisateur
+    //     return response()->json([
+    //         'message' => 'Connexion réussie',
+    //         'utilisateur' => $utilisateur,
+    //         'token' => $jwt,
+    //     ]);
+    // }
+
+
 
     public function store(Request $request)
     {
