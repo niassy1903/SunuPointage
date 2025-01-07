@@ -48,13 +48,13 @@ export class UtilisateurComponent implements OnInit {
   showBlockModal: boolean = false;
   showDeleteSelectedModal: boolean = false;
   showBlockSelectedModal: boolean = false;
+  allUsers: User[] = [];
+
 
   ngOnInit() {
-    // Appel du service pour récupérer les utilisateurs
     this.utilisateurService.getUtilisateurs().subscribe(
       (data) => {
-        // Formater les données des utilisateurs
-        this.users = data.map(user => ({
+        this.allUsers = data.map(user => ({
           id: user.id,
           photo: '/images/profil.png',
           firstName: user.nom,
@@ -64,10 +64,10 @@ export class UtilisateurComponent implements OnInit {
           email: user.email,
           matricule: user.matricule,
           address: user.adresse,
-          departement: user.departement, // Ajout de la propriété departement
-          cohorte: user.cohorte // Ajout de la propriété cohorte
+          departement: user.departement,
+          cohorte: user.cohorte
         }));
-        // Mettre à jour la pagination
+        this.users = [...this.allUsers]; // Initialise users avec tous les utilisateurs
         this.updatePagination();
       },
       (error) => {
@@ -75,29 +75,33 @@ export class UtilisateurComponent implements OnInit {
       }
     );
   }
-
+  
   // Met à jour la pagination après un filtrage ou un changement de page
   updatePagination() {
-    // Mettre à jour le nombre total de pages
     this.totalPages = Math.ceil(this.users.length / this.itemsPerPage);
-    // Mettre à jour les utilisateurs filtrés en fonction de la page actuelle
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     this.filteredUsers = this.users.slice(start, end);
   }
+  
 
   // Méthode de filtrage des utilisateurs
   filterUsers(event: Event) {
     const query = (event.target as HTMLInputElement).value;
-    // Filtrer les utilisateurs par prénom ou nom
-    const filtered = this.users.filter(user =>
-      user.firstName.toLowerCase().includes(query.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(query.toLowerCase())
-    );
-    this.users = filtered; // Mettre à jour les utilisateurs avec le filtre
-    this.currentPage = 1; // Réinitialiser la page à 1 après un filtre
+    if (query) {
+      // Filtrer les utilisateurs par prénom ou nom
+      this.users = this.allUsers.filter(user =>
+        user.firstName.toLowerCase().includes(query.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(query.toLowerCase())
+      );
+    } else {
+      // Si la recherche est effacée, restaurer tous les utilisateurs
+      this.users = [...this.allUsers];
+    }
+    this.currentPage = 1; // Réinitialiser la page à 1 après un filtre ou un effacement
     this.updatePagination(); // Recalcule la pagination
   }
+  
 
   // Méthodes de navigation entre les pages
   changePage(page: number) {

@@ -3,7 +3,7 @@ const { ReadlineParser } = require('@serialport/parser-readline');
 const WebSocket = require('ws');
 
 const port = new SerialPort({
-  path: '/dev/ttyUSB0', // Remplacez par le port série correct pour la nouvelle carte Arduino
+  path: '/dev/ttyUSB0', // Remplacez par le port série correct pour l'Arduino
   baudRate: 9600,
 }, (err) => {
   if (err) {
@@ -30,7 +30,26 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify(message)); // Envoi du message JSON au frontend
       }
     } catch (error) {
-      console.error('Erreur lors du parsing des données :', error);
+      // Ignorer l'erreur de parsing sans afficher
+      // Rien à afficher ni à faire ici
+    }
+  });
+
+  ws.on('message', (message) => {
+    try {
+      const command = JSON.parse(message);
+      if (command.type === 'doorControl') {
+        const action = command.action;
+        console.log(`Commande reçue : ${action}`);
+        // Envoyer la commande à l'Arduino pour ouvrir/fermer la porte
+        if (action === 'open') {
+          port.write('OPEN\n');
+        } else if (action === 'close') {
+          port.write('CLOSE\n');
+        }
+      }
+    } catch (error) {
+      // Ignorer l'erreur de parsing ici aussi
     }
   });
 

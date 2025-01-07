@@ -55,6 +55,7 @@ export class EmployeeListComponent implements OnInit {
     }
     this.updatePagination();
   }
+  
 
   updatePagination() {
     this.totalPages = Math.ceil(this.filteredEmployees.length / this.itemsPerPage);

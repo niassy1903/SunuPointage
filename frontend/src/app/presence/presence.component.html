@@ -16,10 +16,17 @@
         <i class="bi bi-calendar"></i>
       </button>
     </div>
-
-    <button class="btn btn-success d-flex align-items-center mb-2">
-      <i class="bi bi-funnel-fill mr-2"></i> Filtrer
-    </button>
+    
+    <div class="mb-2">
+      <label for="filterSelect" class="form-label">Filtrer par statut :</label>
+      <select id="filterSelect" class="form-select" (change)="filterByStatut($event)">
+        <option value="tous">Tous</option>
+        <option value="present">Présent</option>
+        <option value="absent">Absent</option>
+        <option value="retard">Retard</option>
+      </select>
+    </div>
+    
 
     <button class="btn btn-primary d-flex align-items-center mb-2" (click)="markAbsentUsers()">
       <i class="bi bi-check-circle mr-2"></i> Valider multiple

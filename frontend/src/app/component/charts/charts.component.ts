@@ -1,20 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { PointageService } from '../../pointage.service';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgChartsModule } from 'ng2-charts';
 
 @Component({
-  standalone: true,
-  imports: [CommonModule, NgChartsModule],
   selector: 'app-charts',
   templateUrl: './charts.component.html',
   styleUrls: ['./charts.component.css'],
+  standalone: true,
+  imports : [CommonModule, FormsModule, NgChartsModule]
 })
-export class ChartsComponent {
-  // Données pour le graphique en ligne
+export class ChartsComponent implements OnInit {
   public lineChartData = {
     datasets: [
       {
-        data: [60, 70, 80, 91, 65, 75, 50, 70],
+        data: [0, 0, 0, 0, 0, 0, 0],
         label: 'Présences',
         fill: true,
         tension: 0.3,
@@ -23,22 +24,9 @@ export class ChartsComponent {
         pointBackgroundColor: '#90EE90',
       },
     ],
-    labels: ['01 Aug', '02 Aug', '03 Aug', '04 Aug', '07 Aug', '09 Aug', '14 Aug', '16 Aug'],
+    labels: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
   };
 
-  // Données pour le graphique en barres
-  public barChartData = {
-    datasets: [
-      {
-        data: [40, 70, 86, 70, 50],
-        label: 'Fréquentation',
-        backgroundColor: ['#d3d3d3', '#d3d3d3', '#90EE90', '#d3d3d3', '#d3d3d3'],
-      },
-    ],
-    labels: ['admin', 'IT', 'Marketing', 'RD/Digital', 'Sass'],
-  };
-
-  // Options pour les graphiques
   public lineChartOptions = {
     responsive: true,
     plugins: {
@@ -46,32 +34,96 @@ export class ChartsComponent {
         display: true,
       },
     },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 20,
+      },
+    },
+  };
+
+  public lineChartType: 'line' = 'line';
+
+  public selectedFilter: string = 'Quotidienne'; // Par défaut
+  public barChartData = {
+    datasets: [
+      {
+        data: [5, 10, 15, 20, 25],
+        label: 'Retards',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+      },
+    ],
+    labels: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'],
   };
 
   public barChartOptions = {
     responsive: true,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 30,
       },
     },
   };
 
-  public lineChartType: any = 'line';
-  public barChartType: any = 'bar';
+  public barChartType: 'bar' = 'bar';
 
-  // Filtre sélectionné
-  public selectedFilter = 'Quotidienne';
+  constructor(private pointageService: PointageService) {}
 
-  // Méthode pour appliquer le filtre
+  ngOnInit() {
+    this.loadChartData();
+  }
+
+  loadChartData() {
+    const dates = this.getDatesForCurrentWeek();
+    const presenceData: number[] = [0, 0, 0, 0, 0, 0, 0];
+
+    dates.forEach((date, index) => {
+        // Convertir la date au format ISO 8601 avec fuseau horaire
+        const formattedDate = new Date(date).toISOString();  // Cela donne un format comme '2025-01-06T00:00:00.000Z'
+        console.log('Date envoyée à l\'API : ', formattedDate);  // Ajout d'un log pour vérifier la date
+
+        this.pointageService.getDailyPresenceCount(formattedDate).subscribe({
+            next: (response) => {
+                presenceData[index] = response.daily_presence_count || 0;
+                if (index === dates.length - 1) {
+                    this.lineChartData.datasets[0].data = presenceData;
+                }
+            },
+            error: (err) => {
+                console.error(`Erreur lors du chargement des données pour la date ${formattedDate}:`, err);
+            },
+        });
+    });
+}
+
+
+
+getDatesForCurrentWeek(): string[] {
+  const dates: string[] = [];
+  const today = new Date();
+  const firstDay = new Date(today);
+  firstDay.setDate(today.getDate() - today.getDay() + 1); // Lundi
+
+  for (let i = 0; i < 7; i++) {
+      const date = new Date(firstDay);
+      date.setDate(firstDay.getDate() + i);
+      // Format 'YYYY-MM-DD' sans heure
+      dates.push(date.toISOString().split('T')[0]);
+  }
+
+  return dates;
+}
+
   applyFilter(filter: string) {
     this.selectedFilter = filter;
-    if (filter === 'Quotidienne') {
-      this.lineChartData.datasets[0].data = [60, 70, 80, 91, 65, 75, 50, 70];
-    } else if (filter === 'Hebdomadaire') {
-      this.lineChartData.datasets[0].data = [70, 80, 90, 85, 75, 60, 50];
-    } else if (filter === 'Mensuelle') {
-      this.lineChartData.datasets[0].data = [65, 75, 85, 95, 85, 70, 60];
-    }
+    console.log(`Filtre appliqué : ${filter}`);
+    // Vous pouvez ajouter une logique ici pour filtrer les données en fonction du filtre sélectionné
   }
 }

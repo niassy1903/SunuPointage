@@ -68,4 +68,11 @@ export class PointageService {
   getPointageStatistics(date: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/pointages/statistiques/${date}`);
   }
+
+   // Récupérer le nombre de présences quotidiennes
+   getDailyPresenceCount(date: string): Observable<any> {
+    const url = `${this.apiUrl}/pointages/daily-presence/${date}`;
+    return this.http.get(url);
+  }
+  
 }

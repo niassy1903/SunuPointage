@@ -41,35 +41,34 @@
     </table>
   </div>
 
-<!-- Pagination -->
-<div class="d-flex justify-content-center mt-4" *ngIf="!isLoading && totalPages > 1">
-  <nav>
-    <ul class="pagination">
-      <!-- Précédent -->
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <a class="page-link" href="#" (click)="changePage(currentPage - 1)">Précédent</a>
-      </li>
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center mt-4" *ngIf="!isLoading && totalPages > 1">
+    <nav>
+      <ul class="pagination">
+        <!-- Précédent -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" href="#" (click)="changePage(currentPage - 1)">Précédent</a>
+        </li>
 
-      <!-- Pages -->
-      <li
-        class="page-item"
-        [class.active]="currentPage === (idx + 1)"
-        *ngFor="let idx of [].constructor(totalPages); let i = index"
-      >
-        <a class="page-link" href="#" (click)="changePage(i + 1)">{{ i + 1 }}</a>
-      </li>
+        <!-- Pages -->
+        <li
+          class="page-item"
+          [class.active]="currentPage === (idx + 1)"
+          *ngFor="let idx of [].constructor(totalPages); let i = index"
+        >
+          <a class="page-link" href="#" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+        </li>
 
-      <!-- Suivant -->
-      <li class="page-item" [class.disabled]="currentPage === totalPages">
-        <a class="page-link" href="#" (click)="changePage(currentPage + 1)">Suivant</a>
-      </li>
-    </ul>
-  </nav>
-</div>
+        <!-- Suivant -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" href="#" (click)="changePage(currentPage + 1)">Suivant</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 
-<!-- Information de pagination -->
-<div class="text-center mt-2" *ngIf="!isLoading">
-  Page {{ currentPage }} sur {{ totalPages }}
-</div>
-
+  <!-- Information de pagination -->
+  <div class="text-center mt-2" *ngIf="!isLoading">
+    Page {{ currentPage }} sur {{ totalPages }}
+  </div>
 </div>

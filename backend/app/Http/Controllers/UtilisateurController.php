@@ -157,7 +157,7 @@ public function logout(Request $request)
             return response()->json(['message' => 'Erreur lors de la création de l\'utilisateur.', 'error' => $e->getMessage()], 500);
         }
     }
-
+    
     protected function generateMatricule()
     {
         $year = date('Y');
@@ -305,4 +305,13 @@ public function logout(Request $request)
 
         return response()->json(['message' => 'Carte assignée avec succès'], 200);
     }
+
+    public function countEmployers()
+{
+    $count = Utilisateur::where('fonction', 'employer')->count();
+
+    return response()->json(['nombre_employers' => $count], 200);
+}
+
+
 }

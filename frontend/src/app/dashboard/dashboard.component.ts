@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ChartsComponent } from '../component/charts/charts.component';
+import { UtilisateurService } from '../utilisateur.service';
 
 interface DashboardCard {
   icon: string;
@@ -23,7 +24,7 @@ interface DashboardCard {
   imports: [FormsModule, ChartsComponent, HttpClientModule, CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  providers: [PointageService],
+  providers: [PointageService,UtilisateurService],
 })
 export class DashboardComponent implements OnInit {
   currentTime: string = new Date().toLocaleTimeString(); // Heure actuelle
@@ -38,7 +39,7 @@ export class DashboardComponent implements OnInit {
       icon: 'bi bi-people',
       iconClass: 'bg-light-primary',
       title: 'Total Employees',
-      value: 452,
+      value: 0,
       trend: {
         value: 2,
         text: 'nouveaux employés !',
@@ -49,7 +50,7 @@ export class DashboardComponent implements OnInit {
       icon: 'bi bi-person-check',
       iconClass: 'bg-light-success',
       title: 'A l\'heure',
-      value: 360,
+      value: 0,
       trend: {
         value: 10,
         text: 'Moins qu\'hier',
@@ -60,7 +61,7 @@ export class DashboardComponent implements OnInit {
       icon: 'bi bi-person-x',
       iconClass: 'bg-light-danger',
       title: 'Absent',
-      value: 30,
+      value: 0,
       trend: {
         value: 3,
         text: 'Augmentation par rapport à hier',
@@ -71,7 +72,7 @@ export class DashboardComponent implements OnInit {
       icon: 'bi bi-clock-history',
       iconClass: 'bg-light-warning',
       title: 'Arrivée tardive',
-      value: 62,
+      value: 0,
       trend: {
         value: 13,
         text: 'Augmentation par rapport à hier',
@@ -84,7 +85,7 @@ export class DashboardComponent implements OnInit {
       title: 'Départs anticipés',
       value: 6,
       trend: {
-        value: 10,
+        value: 0,
         text: 'Moins qu\'hier',
         isPositive: true,
       },
@@ -93,7 +94,7 @@ export class DashboardComponent implements OnInit {
       icon: 'bi bi-clock',
       iconClass: 'bg-light-secondary',
       title: 'Départs Tardives',
-      value: 42,
+      value: 0,
       trend: {
         value: 2,
         text: 'Augmentation par rapport à hier',
@@ -102,17 +103,22 @@ export class DashboardComponent implements OnInit {
     },
   ];
 
-  constructor(private pointageService: PointageService) {}
+  constructor(private pointageService: PointageService,
+    private utilisateurService: UtilisateurService) {}
 
   ngOnInit() {
     // Appel de la méthode pour récupérer les statistiques des pointages par statut
     this.getPointageStatistics(this.currentDate);
+     // Appel du nombre d'employeurs
+     this.getNumberOfEmployers();
   }
 
+  // Récupérer les statistiques de pointage
   getPointageStatistics(date: string) {
     this.pointageService.getPointageStatistics(date).subscribe((data) => {
-      console.log('Données reçues de l\'API:', data); // Affichez les données dans la console
-      this.updateCardValue('Total Employees', data['total_employes']);
+      console.log('Données reçues de l\'API Pointage:', data); // Affichez les données dans la console
+  
+      // Mettre à jour les cartes de statistiques de pointage
       this.updateCardValue('A l\'heure', data['present']);
       this.updateCardValue('Absent', data['absent']);
       this.updateCardValue('Arrivée tardive', data['retard']);
@@ -120,6 +126,24 @@ export class DashboardComponent implements OnInit {
       this.updateCardValue('Départs Tardives', data['depart_tardif']);
     });
   }
+
+  getNumberOfEmployers() {
+    this.utilisateurService.getNumberOfEmployers().subscribe(
+      (response) => {
+        console.log('Réponse de l\'API Nombre d\'employeurs:', response); // Vérifie la structure de la réponse
+        if (response && response.nombre_employers !== undefined) {
+          this.updateCardValue('Total Employees', response.nombre_employers);
+        } else {
+          console.error('Propriété nombre_employers manquante dans la réponse.');
+        }
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération du nombre d\'employeurs', error);
+      }
+    );
+  }
+  
+  
   updateCardValue(cardTitle: string, value: number) {
     const card = this.cards.find((c) => c.title === cardTitle);
     if (card) {

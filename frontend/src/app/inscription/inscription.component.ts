@@ -190,6 +190,7 @@ export class InscriptionComponent implements OnInit, OnDestroy {
     this.showNextStep = true;
   }
 
+  
   onSubmit() {
     if (this.inscriptionForm.valid) {
       const formData = this.inscriptionForm.value;
@@ -207,7 +208,7 @@ export class InscriptionComponent implements OnInit, OnDestroy {
           // Rediriger après quelques secondes (optionnel)
           setTimeout(() => {
             this.router.navigate(['/utilisateur']); // Remplacez '/utilisateur' par la route correcte
-          }, 10000);
+          }, 5000);
         },
         error => {
           console.error('Erreur lors de la création de l\'utilisateur', error);
