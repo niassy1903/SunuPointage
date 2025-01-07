@@ -100,10 +100,14 @@ Route::patch('/utilisateurs/{id}/bloquer', [UtilisateurController::class, 'bloqu
 Route::get('/telephones/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
 
 
-
-
-
-
-
-
 Route::post('/create-pointage', [PointageController::class, 'createPointage']);
+
+
+
+// Route pour obtenir le nombre d'utilisateurs présents par jour
+
+
+Route::get('/pointages/daily-presence/{date}', [PointageController::class, 'getDailyPresenceCount']);
+
+
+Route::get('/utilisateurs/employers/count', [UtilisateurController::class, 'countEmployers']);
