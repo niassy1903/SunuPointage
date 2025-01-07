@@ -1,0 +1,62 @@
+<nav class="sidebar d-flex flex-column bg-white shadow-sm">
+  <div class="sidebar-content d-flex flex-column h-100">
+    <div class="p-3 text-center">
+      <button class="btn btn-link">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+    </div>
+
+    <ul class="nav flex-column flex-grow-1 py-3">
+      <!-- Menu accessible uniquement par l'admin -->
+      <li *ngIf="userRole === 'admin'" class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link text-secondary">
+          <i class="bi bi-grid"></i>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'admin'" class="nav-item">
+        <a routerLink="/presence" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link text-secondary">
+          <i class="bi bi-graph-up"></i>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'admin'" class="nav-item">
+        <a routerLink="/utilisateur" routerLinkActive="active" class="nav-link text-secondary">
+          <i class="bi bi-person"></i>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'admin'" class="nav-item">
+        <a routerLink="/cohorte" routerLinkActive="active" class="nav-link text-secondary">
+          <i class="bi bi-building"></i>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'admin'" class="nav-item">
+        <a routerLink="/departement" routerLinkActive="active" class="nav-link text-secondary">
+          <i class="bi bi-mortarboard"></i>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'admin'" class="nav-item">
+        <a routerLink="/historique" routerLinkActive="active" class="nav-link text-secondary">
+          <i class="bi bi-list"></i>
+        </a>
+      </li>
+
+      <!-- Menu accessible uniquement par le vigile -->
+      <li *ngIf="userRole === 'vigile'" class="nav-item">
+        <a routerLink="/dashboard-vigile" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link text-secondary">
+          <i class="bi bi-speedometer2"></i>
+        </a>
+      </li>
+      <li *ngIf="userRole === 'vigile'" class="nav-item">
+        <a routerLink="/presence" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link text-secondary">
+          <i class="bi bi-graph-up"></i>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Déconnexion -->
+    <div class="text-center p-3">
+      <a href="javascript:void(0);" class="nav-link text-secondary" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</nav>
