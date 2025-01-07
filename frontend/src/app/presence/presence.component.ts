@@ -44,7 +44,9 @@ export class PresenceComponent implements OnInit {
       day: 'numeric',
     });
     this.fetchUtilisateurs();
+    this.filteredPresences = [...this.presences]; // Affiche tous les utilisateurs par défaut
   }
+  
 
   fetchUtilisateurs(): void {
     this.utilisateurService.getUtilisateurs().subscribe(
@@ -130,21 +132,41 @@ export class PresenceComponent implements OnInit {
 
     return `${hours}h ${minutes}m`;
   }
+filterPresences(event: Event): void {
+  const query = (event.target as HTMLInputElement).value.toLowerCase();
+  
+  // Recherche dans le tableau complet
+  this.filteredPresences = this.presences.filter((presence) =>
+    presence.nom.toLowerCase().includes(query) ||
+    presence.prenom.toLowerCase().includes(query) ||
+    presence.card_id.toLowerCase().includes(query) // Recherche également par card_id
+  );
 
-  filterPresences(event: Event): void {
-    const query = (event.target as HTMLInputElement).value;
+  // Après avoir filtré, on met à jour la pagination
+  this.updatePagination();
+}
+
+filterByStatut(event: Event): void {
+  const selectedStatut = (event.target as HTMLSelectElement).value;
+  
+  if (selectedStatut === 'tous') {
+    this.filteredPresences = [...this.presences]; // Montrer tous les utilisateurs
+  } else {
     this.filteredPresences = this.presences.filter((presence) =>
-      presence.nom.toLowerCase().includes(query.toLowerCase()) ||
-      presence.prenom.toLowerCase().includes(query.toLowerCase())
+      presence.statut.toLowerCase() === selectedStatut.toLowerCase()
     );
-    this.updatePagination();
   }
 
-  updatePagination(): void {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    this.filteredPresences = this.presences.slice(start, end);
-  }
+  // Après avoir filtré, on met à jour la pagination
+  this.updatePagination();
+}
+
+
+updatePagination(): void {
+  const start = (this.currentPage - 1) * this.itemsPerPage;
+  const end = start + this.itemsPerPage;
+  this.filteredPresences = this.filteredPresences.slice(start, end);
+}
 
   changePage(page: number): void {
     if (page < 1 || page > this.getTotalPages()) return;

@@ -135,6 +135,14 @@ export class UtilisateurService {
         tap(response => console.log('Pointages batch created:', response))
       );
     }
-
+    
+    getNumberOfEmployers(): Observable<any> {
+      return this.http.get<any>(`${this.apiUrl1}/utilisateurs/employers/count`).pipe(
+        tap(response => {
+          console.log('Nombre d\'employeurs récupéré:', response);
+        })
+      );
+    }
+    
     
 }

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { UtilisateurService } from '../utilisateur.service';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { PointageService } from '../pointage.service'; // Import du service PointageService
+import { PointageService } from '../pointage.service';
 
 declare var bootstrap: any;
 
@@ -35,15 +35,15 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
   private pointageId: string | null = null;
   private pointageModal: any;
   isFirstPointageDone: boolean = false;
-  private ws: WebSocket | null = null; // Initialiser avec null
+  private ws: WebSocket | null = null;
 
   totalPointages: number = 0;
   totalValidations: number = 0;
   totalRejets: number = 0;
-  
+
   constructor(
     private utilisateurService: UtilisateurService,
-    private pointageService: PointageService // Injection du service PointageService
+    private pointageService: PointageService
   ) {}
 
   ngOnInit() {
@@ -53,7 +53,6 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       this.updateDateTime();
     }, 1000);
 
-    // Appeler les méthodes pour obtenir les données des pointages, validations et rejets
     this.loadPointagesData();
   }
 
@@ -92,7 +91,6 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
     };
   }
 
-
   loginByCardId(cardId: string) {
     this.utilisateurService.loginByCardId(cardId).subscribe(
       (response) => {
@@ -101,7 +99,7 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
         this.formData.prenom = response.utilisateur.prenom;
         this.formData.fonction = response.utilisateur.fonction;
         this.formData.photo = response.utilisateur.photo;
-        this.imagePreview = response.utilisateur.photo;
+        this.imagePreview = '/images/profil.png'; // Photo par défaut
         this.showImage = true;
         this.showForm = true;
         this.showUserSection = true;
@@ -113,25 +111,20 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       }
     );
   }
-  
+
   checkPointageStatus(cardId: string): void {
-    // Vérification initiale dans le localStorage
     const storedCardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
-  
+
     if (storedCardIds.includes(cardId)) {
-      // Le cardId est déjà enregistré localement
       this.isFirstPointageDone = true;
-      this.pointageId = null; // Pas besoin d'ID de pointage dans ce cas
+      this.pointageId = null;
     } else {
-      // Si non trouvé dans localStorage, vérifier via l'API
       this.utilisateurService.getPointageByCardId(cardId).subscribe(
         (response) => {
           if (response && response.heure_depart === null) {
-            // Un pointage existe et n'est pas encore terminé
             this.pointageId = response.id;
             this.isFirstPointageDone = true;
           } else {
-            // Aucun pointage actif trouvé
             this.pointageId = null;
             this.isFirstPointageDone = false;
           }
@@ -144,46 +137,42 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       );
     }
   }
-  
+
   loadPointagesData(): void {
-    const today = new Date().toISOString().split('T')[0]; // Format: 'YYYY-MM-DD'
-  
-    // Charger le total des pointages
+    const today = new Date().toISOString().split('T')[0];
+
     this.pointageService.getTotalPointages(today).subscribe(
       (data) => {
-        this.totalPointages = data.total_pointages; // Mise à jour du total
+        this.totalPointages = data.total_pointages;
       },
       (error) => {
         console.error('Erreur lors de la récupération des pointages :', error);
       }
     );
-  
-    // Charger le total des pointages validés
+
     this.pointageService.getTotalValidations(today).subscribe(
       (data) => {
-        this.totalValidations = data.total_validations; // Mise à jour des validations
+        this.totalValidations = data.total_validations;
       },
       (error) => {
         console.error('Erreur lors de la récupération des validations :', error);
       }
     );
-  
-    // Charger le total des pointages rejetés
+
     this.pointageService.getTotalRejets(today).subscribe(
       (data) => {
-        this.totalRejets = data.total_rejets; // Mise à jour des rejets
+        this.totalRejets = data.total_rejets;
       },
       (error) => {
         console.error('Erreur lors de la récupération des rejets :', error);
       }
     );
   }
-  
+
   onSubmit(): void {
-    // Afficher le modal de pointage lors de la soumission
     this.showPointageModal();
   }
-  
+
   showPointageModal(): void {
     const modalElement = document.getElementById('pointageModal');
     if (modalElement) {
@@ -193,26 +182,23 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       console.error('Modal de pointage non trouvé dans le DOM.');
     }
   }
-  
-  
+
   confirmPointage() {
     const storedCardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
     if (storedCardIds.includes(this.formData.cardId)) {
-      // Deuxième pointage
       this.confirmSecondPointage();
     } else {
-      // Premier pointage
       this.confirmFirstPointage();
     }
   }
-  
+
   confirmFirstPointage() {
     const heureArrivee = new Date();
     const formattedHeureArrivee = this.formatTime(heureArrivee);
-  
-    const heureLimite = "09:00"; // Heure limite pour considérer un pointage à l'heure
+
+    const heureLimite = "09:00";
     const estRetard = this.isHeureDeRetard(formattedHeureArrivee, heureLimite);
-  
+
     const pointageData: any = {
       carte_id: this.formData.cardId,
       nom: this.formData.name,
@@ -220,18 +206,17 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       heure_arrivee: formattedHeureArrivee,
       statut: estRetard ? 'retard' : 'present',
     };
-  
+
     this.utilisateurService.createPointage(pointageData).subscribe(
       (response) => {
         console.log('Pointage créé :', response);
         this.pointageId = response.id;
         this.isFirstPointageDone = true;
-  
-        // Ajouter le cardId dans un tableau stocké dans localStorage
+
         let cardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
         cardIds.push(this.formData.cardId);
         localStorage.setItem('cardIds', JSON.stringify(cardIds));
-  
+
         this.showSuccessModal();
       },
       (error) => {
@@ -239,46 +224,37 @@ export class DashboardVigileComponent implements OnInit, OnDestroy {
       }
     );
   }
-  
+
   isHeureDeRetard(heureArrivee: string, heureLimite: string): boolean {
-    // Convertir l'heure dans un format 24h pour la comparaison
     const [heureArriveeHeures, heureArriveeMinutes] = heureArrivee.split(":").map(Number);
     const [heureLimiteHeures, heureLimiteMinutes] = heureLimite.split(":").map(Number);
-  
+
     if (heureArriveeHeures > heureLimiteHeures || (heureArriveeHeures === heureLimiteHeures && heureArriveeMinutes > heureLimiteMinutes)) {
-      return true; // Retard
+      return true;
     }
-    return false; // Pas de retard
-  }
-  
-  
-// Modifier la fonction confirmSecondPointage pour récupérer le tableau de cardIds
-confirmSecondPointage() {
-  const cardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
-  if (!cardIds || !cardIds.includes(this.formData.cardId)) {
-    console.error('Le cardId n\'est pas trouvé dans le localStorage');
-    return; // Vous pouvez gérer cette erreur comme vous le souhaitez
+    return false;
   }
 
-  const heureDepart = this.formatTime(new Date());
-  const pointageData: any = { heure_depart: heureDepart };
-
-  this.utilisateurService.updatePointage(this.formData.cardId, pointageData).subscribe(
-    (response) => {
-      console.log('Pointage mis à jour :', response);
-      
-      // Supprimer le cardId du localStorage après le deuxième pointage
-      const updatedCardIds = cardIds.filter((id: string) => id !== this.formData.cardId);
-      localStorage.setItem('cardIds', JSON.stringify(updatedCardIds));
-      
-      this.showSuccessModal();
-    },
-    (error) => {
-      console.error('Erreur lors de la mise à jour du pointage :', error);
+  confirmSecondPointage() {
+    const cardIds = JSON.parse(localStorage.getItem('cardIds') || '[]');
+    if (!cardIds || !cardIds.includes(this.formData.cardId)) {
+      console.error('Le cardId n\'est pas trouvé dans le localStorage');
+      return;
     }
-  );
-}
-  
+
+    const heureDepart = this.formatTime(new Date());
+    const pointageData: any = { heure_depart: heureDepart };
+
+    this.utilisateurService.updatePointage(this.formData.cardId, pointageData).subscribe(
+      (response) => {
+        console.log('Pointage mis à jour :', response);
+        this.showSuccessModal();
+      },
+      (error) => {
+        console.error('Erreur lors de la mise à jour du pointage :', error);
+      }
+    );
+  }
 
   rejectPointage() {
     const pointageData: any = {
@@ -345,7 +321,12 @@ confirmSecondPointage() {
     this.currentTime = `${hours}:${minutes}:${seconds}`;
     this.currentDate = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    // Recharger les données des pointages à chaque changement de date
+    // Vérifie si l'heure est 23:59 pour supprimer les cardIds du localStorage
+    if (hours === '23' && minutes === '59' && seconds === '00') {
+      localStorage.removeItem('cardIds');
+      console.log('Tous les cardIds ont été supprimés du localStorage à 23:59.');
+    }
+
     this.loadPointagesData();
   }
 
@@ -353,5 +334,20 @@ confirmSecondPointage() {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
+  }
+
+  onToggleChange(event: any): void {
+    const isChecked = event.target.checked;
+    this.sendDoorCommand(isChecked);
+  }
+  
+  sendDoorCommand(isOpen: boolean): void {
+    if (this.ws) {
+      const command = {
+        type: 'doorControl',
+        action: isOpen ? 'open' : 'close', // "open" ou "close" en fonction de l'état du bouton
+      };
+      this.ws.send(JSON.stringify(command)); // Envoi de la commande au serveur Node.js via WebSocket
+    }
   }
 }

@@ -3,7 +3,7 @@
   <div class="mb-3">
     <input type="text" class="form-control" placeholder="Rechercher par matricule..." [(ngModel)]="searchTerm" (input)="filterEmployees()">
   </div>
-  <table class="table table-bordered table-hover">
+  <table class="table table-bordered table-hover" *ngIf="filteredEmployees.length > 0">
     <thead class="thead-light">
       <tr>
         <th>Utilisateurs</th>
@@ -11,7 +11,6 @@
         <th>Email</th>
         <th>Adresse</th>
         <th>Département</th>
-        
         <th>Statut</th>
       </tr>
     </thead>
@@ -25,7 +24,6 @@
         <td>{{ employee.email }}</td>
         <td>{{ employee.adresse }}</td>
         <td>{{ departmentName }}</td>
-       
         <td>
           <span class="badge" [ngClass]="{'badge-success': employee.status === 'Active', 'badge-danger': employee.status === 'Banned', 'badge-warning': employee.statut === 'Inactive'}">
             {{ employee.status }}
@@ -34,7 +32,10 @@
       </tr>
     </tbody>
   </table>
-  <div class="d-flex justify-content-center mt-4">
+  <div *ngIf="filteredEmployees.length === 0" class="alert alert-warning">
+    Aucun résultat trouvé pour "{{ searchTerm }}" !
+  </div>
+  <div class="d-flex justify-content-center mt-4" *ngIf="filteredEmployees.length > 0">
     <nav>
       <ul class="pagination">
         <li class="page-item" [class.disabled]="currentPage === 1">
@@ -54,3 +55,4 @@
     </nav>
   </div>
 </div>
+
