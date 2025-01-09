@@ -54,11 +54,16 @@ export class LoginComponent implements OnInit {
       },
       error => {
         console.error('Login failed', error);
-        this.errorMessage = error;
+        if (error.status === 404) {
+          this.errorMessage = 'Carte ID non trouvée';
+        } else if (error.status === 403) {
+          this.errorMessage = 'Accès non autorisé';
+        } else {
+          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+        }
       }
     );
   }
-
   onSubmit() {
     if (this.emailError || this.passwordError) {
       return;
