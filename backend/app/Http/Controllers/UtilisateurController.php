@@ -28,7 +28,6 @@ class UtilisateurController extends Controller
 
     return response()->json(['utilisateur' => $utilisateur], 200);
 }
-
 protected $jwtService;
 
 // Injection du service JwtService via le constructeur

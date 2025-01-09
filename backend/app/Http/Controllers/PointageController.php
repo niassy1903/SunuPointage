@@ -1,17 +1,31 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Pointage;
+use App\Http\Controllers\HistoricPointageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class PointageController extends Controller
 {
+    protected $historicController;
+
+    public function __construct(HistoricPointageController $historicController)
+    {
+        $this->historicController = $historicController;
+    }
+
     // Afficher tous les pointages
     public function index()
     {
         $pointages = Pointage::all();
+
+        // Enregistrer l'historique pour la consultation des pointages
+        $this->historicController->store(new Request([
+            'action' => 'Consultation des pointages',
+            'detail' => 'Affichage de la liste complète des pointages',
+        ]));
+
         return response()->json($pointages);
     }
 
@@ -19,9 +33,17 @@ class PointageController extends Controller
     public function show($id)
     {
         $pointage = Pointage::findOrFail($id);
+
+        // Enregistrer l'historique pour la consultation d'un pointage spécifique
+        $this->historicController->store(new Request([
+            'action' => 'Consultation d\'un pointage',
+            'detail' => 'Affichage du pointage avec ID: ' . $id,
+        ]));
+
         return response()->json($pointage);
     }
 
+    // Créer un pointage
     public function store(Request $request)
     {
         // Validation des données
@@ -33,31 +55,36 @@ class PointageController extends Controller
             'heure_depart' => 'nullable|date_format:H:i',
             'statut' => 'nullable|in:present,absent,malade,conge,retard,rejeter',
         ]);
-    
+
         $today = Carbon::now()->toDateString();
-    
+
         // Vérification de pointage existant
         $existingPointage = Pointage::where('carte_id', $validatedData['carte_id'])
             ->where('date_actuelle', $today)
             ->first();
-    
+
         if ($existingPointage) {
             return response()->json([
                 'error' => 'Un pointage existe déjà pour cette carte aujourd\'hui',
                 'carte_id' => $validatedData['carte_id']
             ], 400);
         }
-    
+
         // Création du pointage
         $validatedData['date_actuelle'] = $today;
         $validatedData['heure_depart'] = $validatedData['heure_depart'] ?? null;
         $pointage = Pointage::create($validatedData);
-    
+
+        // Enregistrer l'historique pour la création du pointage
+        $this->historicController->store(new Request([
+            'action' => 'Création d\'un pointage',
+            'detail' => 'Création d\'un pointage pour la carte ID: ' . $validatedData['carte_id'],
+        ]));
+
         return response()->json($pointage, 201);
     }
-    
 
-
+    // Créer plusieurs pointages
     public function createPointage(Request $request)
     {
         $validatedData = $request->validate([
@@ -68,83 +95,68 @@ class PointageController extends Controller
             '*.heure_depart' => 'nullable|date_format:H:i',
             '*.statut' => 'nullable|in:present,absent,malade,conge,retard,rejeter', // Validation des statuts
         ]);
-    
+
         $today = Carbon::now()->toDateString();
         $createdPointages = [];
-    
+
         foreach ($validatedData as $data) {
             // Recherche d'un pointage existant pour la même carte le même jour
             $existingPointage = Pointage::where('carte_id', $data['carte_id'])
                 ->where('date_actuelle', $today)
                 ->first();
-    
-            // Si un pointage existe déjà pour cette carte aujourd'hui
+
             if ($existingPointage) {
                 return response()->json([
                     'error' => 'Un pointage existe déjà pour cette carte aujourd\'hui',
                     'carte_id' => $data['carte_id']
                 ], 400);
-            } else {
-                // Si aucune heure d'arrivée n'est spécifiée, ce n'est pas une erreur ici
-                $data['heure_arrivee'] = $data['heure_arrivee'] ?? null; // Rendre l'heure d'arrivée optionnelle
-    
-                $data['date_actuelle'] = $today;
-                $data['heure_depart'] = $data['heure_depart'] ?? null;  // Mettre l'heure de départ à null si elle n'est pas définie
-                $pointage = Pointage::create($data);
-    
-                return response()->json($pointage, 201); // Retourner le pointage créé
             }
-    
-            // Ajout des autres pointages (si nécessaire)
+
+            $data['date_actuelle'] = $today;
+            $data['heure_depart'] = $data['heure_depart'] ?? null;  // Mettre l'heure de départ à null si elle n'est pas définie
+            $pointage = Pointage::create($data);
+
+            // Enregistrer l'historique pour la création de chaque pointage
+            $this->historicController->store(new Request([
+                'action' => 'Création d\'un pointage',
+                'detail' => 'Création d\'un pointage pour la carte ID: ' . $data['carte_id'],
+            ]));
+
             $createdPointages[] = $pointage;
         }
-    
+
         return response()->json($createdPointages, 201);
     }
-    
 
-
-
-    // Fonction pour obtenir un pointage par carte_id
-    public function getPointageByCardId($cardId)
+    // Mettre à jour un pointage existant
+    public function update(Request $request, $carte_id)
     {
+        $validatedData = $request->validate([
+            'heure_depart' => 'nullable|date_format:H:i', // Champ facultatif
+        ]);
+
         $today = Carbon::today()->toDateString();
 
-        $pointage = Pointage::where('carte_id', $cardId)
+        // Recherche du pointage par carte_id et date_actuelle
+        $pointage = Pointage::where('carte_id', $carte_id)
             ->whereDate('date_actuelle', $today)
             ->first();
 
-        if ($pointage) {
-            return response()->json($pointage);
-        } else {
-            return response()->json(['message' => 'Pointage non trouvé'], 404);
+        if (!$pointage) {
+            return response()->json(['error' => 'Pointage non trouvé pour ce carte_id aujourd\'hui'], 404);
         }
+
+        // Mise à jour du pointage
+        $pointage->update($validatedData);
+
+        // Enregistrer l'historique pour la mise à jour du pointage
+        $this->historicController->store(new Request([
+            'action' => 'Mise à jour d\'un pointage',
+            'detail' => 'Mise à jour du pointage pour la carte ID: ' . $carte_id,
+        ]));
+
+        return response()->json($pointage);
     }
-
-   // Mettre à jour un pointage existant à partir du carte_id
-public function update(Request $request, $carte_id)
-{
-    $validatedData = $request->validate([
-        'heure_depart' => 'nullable|date_format:H:i', // Champ facultatif
-    ]);
-
-    $today = Carbon::today()->toDateString();
-
-    // Recherche du pointage par carte_id et date_actuelle
-    $pointage = Pointage::where('carte_id', $carte_id)
-        ->whereDate('date_actuelle', $today)
-        ->first();
-
-    if (!$pointage) {
-        return response()->json(['error' => 'Pointage non trouvé pour ce carte_id aujourd\'hui'], 404);
-    }
-
-    // Mise à jour du pointage
-    $pointage->update($validatedData);
-
-    return response()->json($pointage);
-}
-
 
     // Rejeter un pointage
     public function reject(Request $request)
@@ -163,8 +175,15 @@ public function update(Request $request, $carte_id)
 
         $pointage = Pointage::create($validatedData);
 
+        // Enregistrer l'historique pour le rejet du pointage
+        $this->historicController->store(new Request([
+            'action' => 'Rejet d\'un pointage',
+            'detail' => 'Rejet du pointage pour la carte ID: ' . $validatedData['carte_id'],
+        ]));
+
         return response()->json($pointage, 201);
     }
+
     public function getTotalPointages($date)
     {
         // Convertir la date au bon format si nécessaire
@@ -190,7 +209,6 @@ public function update(Request $request, $carte_id)
     ]);
 }
 
-    
     public function getTotalRejets($date)
     {
         // Convertir la date au bon format si nécessaire
@@ -253,6 +271,4 @@ public function getDailyPresenceCount($date)
         'daily_presence_count' => $dailyPresenceCount,
     ]);
 }
-
-
 }

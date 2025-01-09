@@ -6,13 +6,16 @@
 #define RST_PIN 9
 MFRC522 rfid(SS_PIN, RST_PIN); // Instance de l'objet RFID
 
+// Initialisation
 void setup() {
-  Serial.begin(9600); // Démarrer la communication série
-  SPI.begin();        // Initialiser le bus SPI
-  rfid.PCD_Init();    // Initialiser le module RC522
+  Serial.begin(9600);        // Démarrer la communication série
+  SPI.begin();               // Initialiser le bus SPI
+  rfid.PCD_Init();           // Initialiser le module RC522
+
   Serial.println("Scanner RFID prêt. Approchez une carte...");
 }
 
+// Boucle principale
 void loop() {
   // Vérifier si une carte est présente
   if (!rfid.PICC_IsNewCardPresent()) return;
@@ -31,7 +34,7 @@ void loop() {
   Serial.print("Type de carte : ");
   Serial.println(rfid.PICC_GetTypeName(piccType));
 
-  // Envoyer l'UID de la carte à l'application Angular
+  // Construire l'UID en format texte
   String cardId = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
     cardId += String(rfid.uid.uidByte[i], HEX);
