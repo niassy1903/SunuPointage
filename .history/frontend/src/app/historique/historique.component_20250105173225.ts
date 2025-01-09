@@ -25,7 +25,7 @@ export class HistoriqueComponent implements OnInit {
   filteredHistoriques: Historique[] = [];
   currentPage: number = 1;
   totalPages: number = 1;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 5;
   isLoading: boolean = true;
 
   constructor(private historicPointageService: HistoricPointageService) {}

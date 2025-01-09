@@ -1,0 +1,99 @@
+<div class="container mt-5">
+  <h2>Liste des Apprenants - Cohorte {{ cohorteName }}</h2>
+  
+  <!-- Formulaire de recherche -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input type="text" class="form-control" [(ngModel)]="searchTerm" (input)="filterApprenants()" placeholder="Rechercher par matricule">
+    </div>
+  </div>
+
+  <!-- Tableau des apprenants -->
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Matricule</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let apprenant of paginatedApprenants">
+        <td>{{ apprenant.matricule }}</td>
+        <td>{{ apprenant.nom }}</td>
+        <td>{{ apprenant.prenom }}</td>
+        <td>
+          <button class="btn btn-primary" (click)="openEditConfirmation(apprenant)">Modifier</button>
+          <button class="btn btn-danger" (click)="openDeleteConfirmation(apprenant)">Supprimer</button>
+          <button type="button" class="btn btn-danger" (click)="confirmAction()">Confirmer</button>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <nav *ngIf="totalPages > 1">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="changePage(currentPage - 1)">Précédent</a>
+      </li>
+      <li *ngFor="let page of generatePageArray()" class="page-item" [class.active]="page + 1 === currentPage">
+        <a class="page-link" (click)="changePage(page + 1)">{{ page + 1 }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="changePage(currentPage + 1)">Suivant</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirmer l'action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir effectuer cette action ?</p>
+        <p *ngIf="actionType === 'delete'">Cette action supprimera définitivement l'apprenant.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="confirmAction()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal de modification -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Modifier l'apprenant</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitEdit()">
+          <div class="mb-3">
+            <label for="matricule" class="form-label">Matricule</label>
+            <input type="text" class="form-control" id="matricule" [(ngModel)]="selectedApprenant.matricule" name="matricule" required>
+          </div>
+          <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="nom" [(ngModel)]="selectedApprenant.nom" name="nom" required>
+          </div>
+          <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="prenom" [(ngModel)]="selectedApprenant.prenom" name="prenom" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Sauvegarder</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

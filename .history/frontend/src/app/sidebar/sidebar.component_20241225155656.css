@@ -1,0 +1,65 @@
+ /* Sidebar */
+.sidebar {
+    background-color: #FFFFFF; /* Vert pour la sidebar */
+    width: 80px;
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+/* Liste des éléments de navigation */
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100% - 60px);
+}
+
+.sidebar nav li {
+    padding: 15px 0;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sidebar nav li i {
+    font-size: 25px;
+    color: #8DBB36; /* Icônes en blanc pour contraster avec le fond vert */
+}
+
+.sidebar nav li:hover i {
+    color: #a0d36d; /* Survol avec une nuance de vert clair */
+}
+
+/* Icône de déconnexion en bas */
+.logout {
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.logout i {
+    color: red;
+    font-size: 25px;
+}
+
+/* Effet de rétrécissement de la sidebar */
+.sidebar:hover {
+    width: 60px;
+}
+
+
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff; /* Logo en blanc */
+    text-align: center;
+    margin-bottom: 30px;
+}

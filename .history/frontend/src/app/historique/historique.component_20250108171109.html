@@ -1,0 +1,67 @@
+<div class="container-fluid mt-5 historique-container">
+  <h2 class="text-center mb-4">Journal Historiques</h2>
+
+  <!-- Barre de recherche -->
+  <div class="mb-4">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Recherche par nom, prénom ou matricule..."
+      (input)="filterHistoriques($event)"
+      [disabled]="isLoading"
+    />
+  </div>
+
+  <!-- Loader -->
+  <div class="text-center" *ngIf="isLoading">
+    <p>Chargement des historiques...</p>
+  </div>
+
+  <!-- Message "Aucune donnée" -->
+  <div class="text-center" *ngIf="noResults && !isLoading">
+    <p>Aucune donnée trouvée pour cette recherche.</p>
+  </div>
+
+  <!-- Tableau des historiques -->
+  <div class="table-responsive-lg mt-5" *ngIf="!isLoading && !noResults">
+    <table class="table table-hover align-middle mb-2 bg-white">
+      <thead class="table-light text-dark">
+        <tr>
+          <th>Prénom</th>
+          <th>Nom</th>
+          <th>Matricule</th>
+          <th>Date</th>
+          <th>Heure</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let historique of filteredHistoriques">
+          <td>{{ historique.firstName }}</td>
+          <td>{{ historique.lastName }}</td>
+          <td>{{ historique.matricule }}</td>
+          <td>{{ historique.date }}</td>
+          <td>{{ historique.time }}</td>
+          <td>{{ historique.action }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination avec ng-bootstrap -->
+  <div class="d-flex justify-content-center mt-4" *ngIf="!isLoading && totalPages > 1 && !noResults">
+    <ngb-pagination 
+      [(page)]="currentPage" 
+      [pageSize]="itemsPerPage" 
+      [collectionSize]="historiques.length" 
+      (pageChange)="changePage($event)"
+      [maxSize]="5" 
+      [boundaryLinks]="true">
+    </ngb-pagination>
+  </div>
+
+  <!-- Information de pagination -->
+  <div class="text-center mt-2" *ngIf="!isLoading && !noResults">
+    Page {{ currentPage }} sur {{ totalPages }}
+  </div>
+</div>

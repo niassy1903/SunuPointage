@@ -1,0 +1,74 @@
+<div class="container-fluid mt-5 historique-container">
+  <h2 class="text-center mb-4">Journal Historiques</h2>
+
+  <!-- Barre de recherche -->
+  <div class="mb-4">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Recherche rapide..."
+      (input)="filterHistoriques($event)"
+      [disabled]="isLoading"
+    />
+  </div>
+
+  <!-- Loader -->
+  <div class="text-center" *ngIf="isLoading">
+    <p>Chargement des historiques...</p>
+  </div>
+
+  <!-- Tableau des historiques -->
+  <div class="table-responsive-lg mt-5" *ngIf="!isLoading">
+    <table class="table table-hover align-middle mb-2 bg-white">
+      <thead class="table-light text-dark">
+        <tr>
+          <th>Prénom</th>
+          <th>Nom</th>
+          <th>Date</th>
+          <th>Heure</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let historique of filteredHistoriques">
+          <td>{{ historique.firstName }}</td>
+          <td>{{ historique.lastName }}</td>
+          <td>{{ historique.date }}</td>
+          <td>{{ historique.time }}</td>
+          <td>{{ historique.action }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center mt-4" *ngIf="!isLoading && totalPages > 1">
+    <nav>
+      <ul class="pagination">
+        <!-- Précédent -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" href="#" (click)="changePage(currentPage - 1)">Précédent</a>
+        </li>
+
+        <!-- Pages -->
+        <li
+          class="page-item"
+          [class.active]="currentPage === (idx + 1)"
+          *ngFor="let idx of [].constructor(totalPages); let i = index"
+        >
+          <a class="page-link" href="#" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+        </li>
+
+        <!-- Suivant -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" href="#" (click)="changePage(currentPage + 1)">Suivant</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Information de pagination -->
+  <div class="text-center mt-2" *ngIf="!isLoading">
+    Page {{ currentPage }} sur {{ totalPages }}
+  </div>
+</div>

@@ -1,0 +1,69 @@
+/* Sidebar */
+.sidebar {
+    background-color: #FFFFFF;
+    width: 80px;
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+/* Liste des éléments de navigation */
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100% - 60px);
+}
+
+.sidebar nav li {
+    padding: 15px 0;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sidebar nav li i {
+    font-size: 25px;
+    color: #8DBB36; /* Icônes en vert */
+}
+
+.sidebar nav li:hover i {
+    color: #a0d36d; /* Survol avec une nuance de vert clair */
+}
+
+/* Icône de déconnexion en bas */
+.logout {
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.logout i {
+    color: red;
+    font-size: 25px;
+}
+
+/* Effet de rétrécissement de la sidebar */
+.sidebar:hover {
+    width: 60px;
+}
+
+/* Tooltip (info-bulle) de style par défaut */
+[title]:hover:after {
+    content: attr(title);
+    position: absolute;
+    background-color: #000;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+}
