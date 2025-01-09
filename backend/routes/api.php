@@ -26,6 +26,9 @@ Route::get('/utilisateurs/liste-apprenants-par-cohorte/{cohorte}', [UtilisateurC
 Route::post('/assign-card', [UtilisateurController::class, 'assignCard']);
 Route::patch('/utilisateurs/{id}/bloquer', [UtilisateurController::class, 'bloquer']);
 Route::get('/telephones/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
+Route::put('/utilisateurs/{id}/reactiver', [UtilisateurController::class, 'reactiver']);
+Route::post('/utilisateurs/reactiver-multiple', [UtilisateurController::class, 'reactiverMultiple']);
+
 
 // Routes liées aux pointages
 Route::get('/pointages', [PointageController::class, 'index']);
@@ -50,6 +53,7 @@ Route::prefix('historic-pointages')->group(function () {
 // Routes liées aux départements et cohortes
 Route::apiResource('departements', DepartementController::class);
 Route::apiResource('cohortes', CohorteController::class);
+Route::get('/cohortes/check/{id}', [CohorteController::class, 'checkExistence']);
 
 Route::post('/logout', [UtilisateurController::class, 'logout']);
 
@@ -66,3 +70,10 @@ Route::middleware(['jwt.auth'])->group(function () {
 // Route pour obtenir le nombre d'utilisateurs présents par jour
 Route::get('/pointages/daily-presence/{date}', [PointageController::class, 'getDailyPresenceCount']);
 Route::get('/utilisateurs/employers/count', [UtilisateurController::class, 'countEmployers']);
+
+
+Route::get('/check-email/{email}', [UtilisateurController::class, 'checkEmailExists']);
+Route::get('/check-telephone/{telephone}', [UtilisateurController::class, 'checkTelephoneExists']);
+
+
+Route::delete('utilisateurs/supprimer-multiple', [UtilisateurController::class, 'destroyMultiple']);

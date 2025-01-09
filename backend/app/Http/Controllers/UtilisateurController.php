@@ -39,33 +39,33 @@ public function __construct(JwtService $jwtService)
 
 public function loginByCardId(Request $request)
 {
-    // Valider la présence du card_id dans la requête
     $request->validate([
         'card_id' => 'required|string',
     ]);
 
     Log::info('Card ID reçu : ' . $request->card_id);
 
-    // Recherche de l'utilisateur avec le card_id dans la collection MongoDB
     $utilisateur = Utilisateur::where('card_id', $request->card_id)->first();
 
     if (!$utilisateur) {
         return response()->json(['message' => 'Carte ID non trouvée'], 404);
     }
 
-    // Payload pour le token JWT
+    // Vérification du statut
+    if ($utilisateur->status === 'bloqué') {
+        return response()->json(['message' => 'Compte bloqué. Veuillez contacter l\'administration.'], 403);
+    }
+
     $payload = [
         'id' => $utilisateur->id,
         'email' => $utilisateur->email,
-        'role' => $utilisateur->fonction,
-        'iat' => time(),   // Temps d'émission du token
-        'exp' => time() + 3600, // Expiration dans 1 heure
+        'fonction' => $utilisateur->fonction,
+        'iat' => time(),
+        'exp' => time() + 3600,
     ];
 
-    // Générer le token JWT avec la clé secrète
     $jwt = $this->jwtService->generateToken($payload);
 
-    // Retourner la réponse avec le token et les informations de l'utilisateur
     return response()->json([
         'message' => 'Connexion réussie avec la carte',
         'utilisateur' => $utilisateur,
@@ -73,41 +73,54 @@ public function loginByCardId(Request $request)
     ]);
 }
 
+
+public function checkEmailExists($email)
+{
+    $exists = Utilisateur::where('email', $email)->exists();
+    return response()->json(['exists' => $exists]);
+}
+
+public function checkTelephoneExists($telephone)
+{
+    $exists = Utilisateur::where('telephone', $telephone)->exists();
+    return response()->json(['exists' => $exists]);
+}
+
 public function login(Request $request)
 {
-    // Valider la présence de l'email et du mot de passe dans la requête
     $request->validate([
         'email' => 'required|email',
         'mot_de_passe' => 'required',
     ]);
 
-    // Recherche de l'utilisateur avec l'email
     $utilisateur = Utilisateur::where('email', $request->email)->first();
 
-    // Vérifier si l'utilisateur existe et si le mot de passe est correct
     if (!$utilisateur || !Hash::check($request->mot_de_passe, $utilisateur->mot_de_passe)) {
         return response()->json(['message' => 'Email ou mot de passe incorrect'], 401);
     }
 
-    // Payload pour le token JWT
+    // Vérification du statut
+    if ($utilisateur->status === 'bloqué') {
+        return response()->json(['message' => 'Compte bloqué. Veuillez contacter l\'administration.'], 403);
+    }
+
     $payload = [
         'id' => $utilisateur->id,
         'email' => $utilisateur->email,
         'role' => $utilisateur->fonction,
         'iat' => time(),
-        'exp' => time() + 3600, // Expiration dans 1 heure
+        'exp' => time() + 3600,
     ];
 
-    // Générer le token JWT avec la clé secrète
     $jwt = $this->jwtService->generateToken($payload);
 
-    // Retourner la réponse avec le token et les informations de l'utilisateur
     return response()->json([
         'message' => 'Connexion réussie',
         'utilisateur' => $utilisateur,
         'token' => $jwt,
     ]);
 }
+
 
 public function logout(Request $request)
 {
@@ -224,6 +237,35 @@ public function logout(Request $request)
         return response()->json(['message' => 'Utilisateur bloqué avec succès.']);
     }
 
+    public function reactiverMultiple(Request $request)
+{
+    $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:utilisateurs,id', // Vérifie que chaque ID existe dans la table 'utilisateurs'
+    ]);
+
+    // Mettre à jour le statut de tous les utilisateurs spécifiés
+    Utilisateur::whereIn('id', $request->ids)->update(['status' => 'actif']);
+
+    return response()->json(['message' => 'Utilisateurs réactivés avec succès.'], 200);
+}
+
+
+    public function destroyMultiple(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:utilisateurs,id', // Vérifie que chaque ID existe dans la table 'utilisateurs'
+        ]);
+
+        // Supprime les utilisateurs spécifiés par leurs IDs
+        Utilisateur::whereIn('id', $request->ids)->delete();
+
+        return response()->json(['message' => 'Utilisateurs supprimés avec succès.'], 200);
+    }
+
+
+
     // Méthode pour réactiver un utilisateur
     public function reactiver($id)
     {
@@ -312,6 +354,8 @@ public function logout(Request $request)
 
     return response()->json(['nombre_employers' => $count], 200);
 }
+
+
 
 
 }

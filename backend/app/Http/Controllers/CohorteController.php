@@ -60,6 +60,8 @@ class CohorteController extends Controller
             foreach ($apprenants as $apprenant) {
                 $apprenant->delete();
             }
+
+
         }
 
         // Suppression de la cohorte
@@ -67,5 +69,20 @@ class CohorteController extends Controller
 
         return response()->json(null, 204);  // Suppression réussie sans contenu
     }
+
+    public function checkExistence($id)
+{
+    // Vérifier si la cohorte existe
+    $exists = Cohorte::where('id', $id)->exists();
+
+    // Retourner une réponse JSON
+    if ($exists) {
+        return response()->json(['message' => 'La cohorte existe.', 'exists' => true], 200);
+    } else {
+        return response()->json(['message' => 'La cohorte n\'existe pas.', 'exists' => false], 404);
+    }
+}
+
+
 }
 
