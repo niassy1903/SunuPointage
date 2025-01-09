@@ -209,7 +209,6 @@ class PointageController extends Controller
     ]);
 }
 
-    
     public function getTotalRejets($date)
     {
         // Convertir la date au bon format si nécessaire
@@ -272,6 +271,4 @@ public function getDailyPresenceCount($date)
         'daily_presence_count' => $dailyPresenceCount,
     ]);
 }
-
-
 }

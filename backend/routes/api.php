@@ -55,6 +55,7 @@ Route::apiResource('cohortes', CohorteController::class);
 Route::get('/cohortes/check/{id}', [CohorteController::class, 'checkExistence']);
 
 Route::post('/logout', [UtilisateurController::class, 'logout']);
+Route::apiResource('utilisateurs', UtilisateurController::class);
 
 // Toutes les autres routes nécessitent une authentification JWT
 Route::middleware(['jwt.auth'])->group(function () {
@@ -62,7 +63,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::apiResource('utilisateurs', UtilisateurController::class);
 
     
 });
