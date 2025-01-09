@@ -30,6 +30,9 @@
             <div *ngIf="inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched" class="text-danger">
               Email est incorrect.
             </div>
+            <div *ngIf="emailExists" class="text-danger">
+              Cet email existe déjà.
+            </div>
           </div>
         </div>
         <div class="form-group row">
@@ -70,6 +73,12 @@
         <div *ngIf="showNextStep">
           <div *ngIf="fonction === 'vigile' || fonction === 'admin'">
             <div class="form-group row">
+              <div class="form-group row">
+                <label for="photo" class="col-sm-2 col-form-label">Photo</label>
+                <div class="col-sm-10">
+                  <input type="file" class="form-control" id="photo" formControlName="photo">
+                </div>
+              </div>
               <label for="mot_de_passe" class="col-sm-2 col-form-label">Nouveau mot de passe</label>
               <div class="col-sm-10">
                 <div class="input-group">
@@ -117,14 +126,7 @@
                 <input type="file" class="form-control" id="photo" formControlName="photo">
               </div>
             </div>
-            <div class="form-group row">
-              <label for="departement" class="col-sm-2 col-form-label">Département</label>
-              <div class="col-sm-10">
-                <select class="form-control" id="departement" formControlName="departement">
-                  <option *ngFor="let departement of departements" [value]="departement.nom">{{ departement.nom }}</option>
-                </select>
-              </div>
-            </div>
+          
             <div class="form-group row">
               <label for="cohorte" class="col-sm-2 col-form-label">Cohorte</label>
               <div class="col-sm-10">

@@ -30,6 +30,9 @@ export class EditComponent implements OnInit {
   passwordStrength: string = '';
   showAncienPassword: boolean = false;
   showNewPassword: boolean = false;
+  emailExists: boolean = false;
+telephoneExists: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,

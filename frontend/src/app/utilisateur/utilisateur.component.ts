@@ -50,7 +50,6 @@ export class UtilisateurComponent implements OnInit {
   showBlockSelectedModal: boolean = false;
   allUsers: User[] = [];
 
-
   ngOnInit() {
     this.utilisateurService.getUtilisateurs().subscribe(
       (data) => {
@@ -75,7 +74,7 @@ export class UtilisateurComponent implements OnInit {
       }
     );
   }
-  
+
   // Met à jour la pagination après un filtrage ou un changement de page
   updatePagination() {
     this.totalPages = Math.ceil(this.users.length / this.itemsPerPage);
@@ -83,7 +82,6 @@ export class UtilisateurComponent implements OnInit {
     const end = start + this.itemsPerPage;
     this.filteredUsers = this.users.slice(start, end);
   }
-  
 
   // Méthode de filtrage des utilisateurs
   filterUsers(event: Event) {
@@ -101,7 +99,6 @@ export class UtilisateurComponent implements OnInit {
     this.currentPage = 1; // Réinitialiser la page à 1 après un filtre ou un effacement
     this.updatePagination(); // Recalcule la pagination
   }
-  
 
   // Méthodes de navigation entre les pages
   changePage(page: number) {

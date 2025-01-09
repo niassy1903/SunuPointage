@@ -55,9 +55,44 @@
   color: white;
 }
 
-/* Hover effet */
+/* Hover effect */
 .user-list table tbody tr:hover {
   background-color: #f1f1f1;
   transition: all 0.3s ease;
   cursor: pointer;
+}
+
+/* Style pour les boutons désactivés */
+.btn-disabled {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* Style pour les infobulles */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Position de l'infobulle au-dessus du bouton */
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }

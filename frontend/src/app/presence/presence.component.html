@@ -4,20 +4,20 @@
   <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
     <input
       type="text"
-      class="form-control w-50 mb-2"
-      placeholder="Rechercher un employé..."
+      class="form-control w-25 mb-2 me-2"
+      placeholder="Rechercher par matricule"
       [(ngModel)]="searchText"
       (input)="filterPresences($event)"
     />
 
-    <div class="date-container d-flex align-items-center">
+    <div class="date-container d-flex align-items-center me-2">
       <span class="current-date mr-2">{{ currentDate }}</span>
       <button class="btn date-button">
         <i class="bi bi-calendar"></i>
       </button>
     </div>
-    
-    <div class="mb-2">
+
+    <div class="mb-2 me-2">
       <label for="filterSelect" class="form-label">Filtrer par statut :</label>
       <select id="filterSelect" class="form-select" (change)="filterByStatut($event)">
         <option value="tous">Tous</option>
@@ -26,21 +26,19 @@
         <option value="retard">Retard</option>
       </select>
     </div>
-    
-
-    <button class="btn btn-primary d-flex align-items-center mb-2" (click)="markAbsentUsers()">
-      <i class="bi bi-check-circle mr-2"></i> Valider multiple
-    </button>
 
     <button class="btn btn-warning d-flex align-items-center mb-2" (click)="openConfirmationModal()">
       <i class="bi bi-save mr-2"></i> Enregistrer les modifications
     </button>
   </div>
 
+  <div *ngIf="noResults" class="alert alert-info">Aucun résultat pour "{{ searchText }}"</div>
+
   <div class="table-responsive">
     <table class="table table-bordered table-striped">
       <thead class="thead-dark">
         <tr>
+          <td>Matricule</td>
           <th>Card ID</th>
           <th>Nom</th>
           <th>Prénom</th>
@@ -56,6 +54,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let presence of filteredPresences">
+          <td>{{presence.matricule}}</td>
           <td>{{ presence.card_id || '--' }}</td>
           <td>{{ presence.nom || '--' }}</td>
           <td>{{ presence.prenom || '--' }}</td>

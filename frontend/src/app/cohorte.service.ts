@@ -33,4 +33,9 @@ export class CohorteService {
   deleteCohorte(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
+
+  checkCohorteExistence(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/check/${id}`);
+  }
+  
 }

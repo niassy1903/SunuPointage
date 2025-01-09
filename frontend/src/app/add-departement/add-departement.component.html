@@ -21,8 +21,7 @@
               {{ errorMessage }}
             </div>
           </div>
-  
-          <!-- Champ Année de création -->
+            <!-- Champ Année de création -->
           <div class="mb-3">
             <label for="annee_creation" class="form-label fw-bold">Année de création :</label>
             <input
@@ -31,9 +30,11 @@
               id="annee_creation"
               name="annee_creation"
               [(ngModel)]="departement.annee_creation"
+              [max]="getMaxDate()"
               required
             />
           </div>
+
   
           <!-- Champ Description -->
           <div class="mb-3">

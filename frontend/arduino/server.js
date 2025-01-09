@@ -3,7 +3,7 @@ const { ReadlineParser } = require('@serialport/parser-readline');
 const WebSocket = require('ws');
 
 const port = new SerialPort({
-  path: '/dev/ttyUSB0', // Remplacez par le port série correct
+  path: '/dev/ttyACM0', // Remplacez par le port série correct
   baudRate: 9600,
 }, (err) => {
   if (err) {

@@ -29,10 +29,11 @@ export class InscriptionComponent implements OnInit, OnDestroy {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   telephoneExists: boolean = false;
+  emailExists: boolean = false;
   cardIdExists: boolean = false;
   ws: WebSocket;
-  isAssigningCard: boolean = false; // Ajout de cette propriété
-  scannedCardId: string = ''; // Ajout de cette variable pour stocker le cardId scanné
+  isAssigningCard: boolean = false;
+  scannedCardId: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -53,7 +54,7 @@ export class InscriptionComponent implements OnInit, OnDestroy {
       cohorte: [''],
       mot_de_passe: ['', [Validators.minLength(6), this.passwordStrengthValidator()]],
       confirm_mot_de_passe: ['', [Validators.minLength(6)]],
-      card_id: ['', Validators.nullValidator] // Ajout du champ card_id avec nullValidator
+      card_id: ['', Validators.nullValidator]
     }, { validator: this.passwordMatchValidator });
 
     this.inscriptionForm.get('telephone')?.valueChanges
@@ -70,7 +71,20 @@ export class InscriptionComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Initialize WebSocket connection
+    this.inscriptionForm.get('email')?.valueChanges
+      .pipe(
+        debounceTime(300),
+        switchMap(value => this.utilisateurService.checkEmailExists(value))
+      )
+      .subscribe(response => {
+        this.emailExists = response.exists;
+        if (response.exists) {
+          this.inscriptionForm.get('email')?.setErrors({ emailExists: true });
+        } else {
+          this.inscriptionForm.get('email')?.setErrors(null);
+        }
+      });
+
     this.ws = new WebSocket('ws://localhost:8080');
   }
 
@@ -88,13 +102,10 @@ export class InscriptionComponent implements OnInit, OnDestroy {
       this.fonction = fonctionControl.value;
     }
 
-    // Se connecter au serveur WebSocket
-    this.ws = new WebSocket('ws://localhost:8080');
-
     this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'cardRead') {
-        this.scannedCardId = data.cardId; // Stocker le cardId scanné
+        this.scannedCardId = data.cardId;
         this.inscriptionForm.get('card_id')?.setValue(this.scannedCardId);
         this.checkCardIdExists(this.scannedCardId);
       }
@@ -102,7 +113,6 @@ export class InscriptionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Fermer la connexion WebSocket
     if (this.ws) {
       this.ws.close();
     }
@@ -190,7 +200,6 @@ export class InscriptionComponent implements OnInit, OnDestroy {
     this.showNextStep = true;
   }
 
-  
   onSubmit() {
     if (this.inscriptionForm.valid) {
       const formData = this.inscriptionForm.value;
@@ -201,13 +210,11 @@ export class InscriptionComponent implements OnInit, OnDestroy {
         response => {
           console.log('Utilisateur créé avec succès', response);
 
-          // Afficher le modal de succès
           const successModal = new bootstrap.Modal(document.getElementById('successModal')!);
           successModal.show();
 
-          // Rediriger après quelques secondes (optionnel)
           setTimeout(() => {
-            this.router.navigate(['/utilisateur']); // Remplacez '/utilisateur' par la route correcte
+            this.router.navigate(['/utilisateur']);
           }, 5000);
         },
         error => {

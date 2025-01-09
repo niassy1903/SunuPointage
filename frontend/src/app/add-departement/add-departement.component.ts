@@ -65,4 +65,14 @@ export class AddDepartementComponent {
     );
     successModal.show();
   }
+
+  getMaxDate(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mois au format MM
+    const day = String(today.getDate()).padStart(2, '0');       // Jour au format DD
+    return `${year}-${month}-${day}`; // Format YYYY-MM-DD
+  }
+
+  
 }

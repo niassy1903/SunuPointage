@@ -48,15 +48,12 @@ th, td {
   border-bottom: 1px solid #dee2e6;
 }
 
-
-
 /* Style pour les liens de pagination */
 .page-link {
   color: #007bff;
   font-size: 0.9rem;
   text-decoration: none;
 }
-
 
 /* Bordure et style pour le container de la date */
 .date-container {
@@ -75,8 +72,6 @@ th, td {
   cursor: pointer;
   margin-left: 5px;
 }
-
-
 
 /* Texte pour la date */
 .current-date {
@@ -102,8 +97,6 @@ th, td {
   margin-right: 8px;
   font-size: 1.1rem;
 }
-
-
 
 /* Style des badges de statut */
 .status-badge {
@@ -160,7 +153,6 @@ button, .btn {
 
   .current-date {
     margin-bottom: 10px;
-    
   }
 }
 

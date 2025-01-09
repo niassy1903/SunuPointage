@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UtilisateurService } from '../utilisateur.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 declare var bootstrap: any;
 
 interface Presence {
+  matricule: string;
   card_id: string;
   nom: string;
   prenom: string;
@@ -26,13 +29,17 @@ interface Presence {
   imports: [FormsModule, CommonModule, HttpClientModule],
   providers: [UtilisateurService],
 })
-export class PresenceComponent implements OnInit {
+export class PresenceComponent implements OnInit, OnDestroy {
   searchText: string = '';
   currentDate: string = new Date().toLocaleDateString('fr-FR');
   presences: Presence[] = [];
   filteredPresences: Presence[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 10;
+  noResults: boolean = false;
+
+  private dataSubject = new Subject<Presence[]>();
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(private utilisateurService: UtilisateurService) {}
 
@@ -43,16 +50,27 @@ export class PresenceComponent implements OnInit {
       month: 'long',
       day: 'numeric',
     });
+
+    this.dataSubject.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data) => {
+      this.presences = data;
+      this.filteredPresences = [...this.presences]; // Affiche tous les utilisateurs par défaut
+      this.updatePagination();
+    });
+
     this.fetchUtilisateurs();
-    this.filteredPresences = [...this.presences]; // Affiche tous les utilisateurs par défaut
   }
-  
+
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
 
   fetchUtilisateurs(): void {
     this.utilisateurService.getUtilisateurs().subscribe(
       (data) => {
         console.log('Utilisateurs reçus :', data);
-        this.presences = data.map((user) => ({
+        const updatedPresences = data.map((user) => ({
+          matricule: user.matricule,
           card_id: user.card_id,
           nom: user.nom,
           prenom: user.prenom,
@@ -64,8 +82,8 @@ export class PresenceComponent implements OnInit {
           isChecked: false,
         }));
 
-        this.loadPointageData();
-        this.updatePagination();
+        this.loadPointageData(updatedPresences);
+        this.dataSubject.next(updatedPresences);
       },
       (error) => {
         console.error('Erreur lors du chargement des utilisateurs :', error);
@@ -99,8 +117,8 @@ export class PresenceComponent implements OnInit {
     }
   }
 
-  loadPointageData(): void {
-    this.presences.forEach((presence) => {
+  loadPointageData(presences: Presence[]): void {
+    presences.forEach((presence) => {
       this.utilisateurService.getPointageByCardId(presence.card_id).subscribe(
         (pointage) => {
           presence.statut = pointage.statut;
@@ -132,41 +150,46 @@ export class PresenceComponent implements OnInit {
 
     return `${hours}h ${minutes}m`;
   }
-filterPresences(event: Event): void {
-  const query = (event.target as HTMLInputElement).value.toLowerCase();
-  
-  // Recherche dans le tableau complet
-  this.filteredPresences = this.presences.filter((presence) =>
-    presence.nom.toLowerCase().includes(query) ||
-    presence.prenom.toLowerCase().includes(query) ||
-    presence.card_id.toLowerCase().includes(query) // Recherche également par card_id
-  );
 
-  // Après avoir filtré, on met à jour la pagination
-  this.updatePagination();
-}
+  filterPresences(event: Event): void {
+    const query = (event.target as HTMLInputElement).value.toLowerCase();
 
-filterByStatut(event: Event): void {
-  const selectedStatut = (event.target as HTMLSelectElement).value;
-  
-  if (selectedStatut === 'tous') {
-    this.filteredPresences = [...this.presences]; // Montrer tous les utilisateurs
-  } else {
-    this.filteredPresences = this.presences.filter((presence) =>
-      presence.statut.toLowerCase() === selectedStatut.toLowerCase()
-    );
+    if (query === '') {
+      this.filteredPresences = [...this.presences]; // Réinitialiser le tableau pour afficher toutes les données
+      this.noResults = false;
+    } else {
+      this.filteredPresences = this.presences.filter((presence) =>
+        presence.nom.toLowerCase().includes(query) ||
+        presence.prenom.toLowerCase().includes(query) ||
+        presence.card_id.toLowerCase().includes(query) ||
+        presence.matricule.toLowerCase().includes(query) // Recherche également par matricule
+      );
+
+      this.noResults = this.filteredPresences.length === 0;
+    }
+
+    this.updatePagination();
   }
 
-  // Après avoir filtré, on met à jour la pagination
-  this.updatePagination();
-}
+  filterByStatut(event: Event): void {
+    const selectedStatut = (event.target as HTMLSelectElement).value;
 
+    if (selectedStatut === 'tous') {
+      this.filteredPresences = [...this.presences]; // Montrer tous les utilisateurs
+    } else {
+      this.filteredPresences = this.presences.filter((presence) =>
+        presence.statut.toLowerCase() === selectedStatut.toLowerCase()
+      );
+    }
 
-updatePagination(): void {
-  const start = (this.currentPage - 1) * this.itemsPerPage;
-  const end = start + this.itemsPerPage;
-  this.filteredPresences = this.filteredPresences.slice(start, end);
-}
+    this.updatePagination();
+  }
+
+  updatePagination(): void {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    this.filteredPresences = this.filteredPresences.slice(start, end);
+  }
 
   changePage(page: number): void {
     if (page < 1 || page > this.getTotalPages()) return;
@@ -175,7 +198,7 @@ updatePagination(): void {
   }
 
   getTotalPages(): number {
-    return Math.ceil(this.presences.length / this.itemsPerPage);
+    return Math.ceil(this.filteredPresences.length / this.itemsPerPage);
   }
 
   getStatutStyle(statut: string): { [klass: string]: any } {
@@ -217,6 +240,7 @@ updatePagination(): void {
     const pointageData = this.presences
       .filter((presence) => presence.isChecked && presence.statut === 'Absent')
       .map((presence) => ({
+        matricule: presence.matricule,
         carte_id: presence.card_id,
         nom: presence.nom,
         prenom: presence.prenom,

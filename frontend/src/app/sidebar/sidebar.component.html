@@ -7,87 +7,79 @@
     </div>
 
     <ul class="nav flex-column flex-grow-1 py-3">
-      <!-- Seul le vigile verra ce lien -->
       <li *ngIf="userRole === 'vigile'" class="nav-item">
         <a
           routerLink="/dashboard-vigile"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-speedometer2"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-speedometer2" title="Tableau de bord"></i>
         </a>
       </li>
 
-      <!-- Liens supplémentaires visibles uniquement pour l'admin -->
       <li *ngIf="userRole === 'admin'" class="nav-item">
         <a
           routerLink="/dashboard"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-grid"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-grid" title="Tableau de bord Admin"></i>
         </a>
       </li>
+
       <li *ngIf="userRole === 'admin'" class="nav-item">
         <a
           routerLink="/utilisateur"
           routerLinkActive="active"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-person"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-person" title="Utilisateurs"></i>
         </a>
       </li>
+
       <li *ngIf="userRole === 'admin'" class="nav-item">
         <a
           routerLink="/presence"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-graph-up"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-graph-up" title="Présence"></i>
         </a>
       </li>
+
       <li *ngIf="userRole === 'admin'" class="nav-item">
         <a
           routerLink="/cohorte"
           routerLinkActive="active"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-building"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-building" title="Cohorte"></i>
         </a>
       </li>
+
       <li *ngIf="userRole === 'admin'" class="nav-item">
         <a
           routerLink="/departement"
           routerLinkActive="active"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-mortarboard"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-mortarboard" title="Départements"></i>
         </a>
       </li>
+
       <li *ngIf="userRole === 'admin'" class="nav-item">
         <a
           routerLink="/historique"
           routerLinkActive="active"
-          class="nav-link text-secondary"
-        >
-          <i class="bi bi-list"></i>
+          class="nav-link text-secondary">
+          <i class="bi bi-list" title="Historique"></i>
         </a>
       </li>
-
-      <!-- Lien accessible à tous les utilisateurs -->
-
     </ul>
 
     <div class="text-center p-3">
       <a
         href="javascript:void(0);"
         class="nav-link text-secondary"
-        (click)="logout()"
-      >
-        <i class="bi bi-box-arrow-right"></i>
+        (click)="logout()">
+        <i class="bi bi-box-arrow-right" title="Déconnexion"></i>
       </a>
     </div>
   </div>
