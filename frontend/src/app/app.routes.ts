@@ -19,34 +19,25 @@ import { ApprenantListCohorteComponent } from './apprenant-list-cohorte/apprenan
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
-
-
-
-
-
 export const routes: Routes = [
-    {path: 'dashboard', component : DashboardComponent},
-    {path: 'sidebar', component : SidebarComponent},
-    {path: 'navebar',component: NavbarComponent},
-    {path: 'presence',component: PresenceComponent},
-    {path: 'login', component: LoginComponent},
-    {path: 'utilisateur', component:UtilisateurComponent},
-    {path: 'departement',component:DepartementComponent},
-    {path: 'cohorte',component:CohorteComponent},
-    {path: 'historique',component:HistoriqueComponent},
-    {path: 'inscription',component:InscriptionComponent},
-    { path: 'edit/:id', component: EditComponent },
-    {path:'add-departement', component: AddDepartementComponent},
-    {path:'dashboard-vigile', component: DashboardVigileComponent},
-    {path:'add-cohorte',component:AddCohorteComponent},
-    { path: 'edit-cohorte/:id', component: EditCohorteComponent },
-    { path: 'employee-list/:id', component: EmployeeListComponent },
-    { path: 'departements/:departmentName/employees', component: EmployeeListComponent },
-    { path: 'cohortes/:cohorteName/apprenants', component: ApprenantListCohorteComponent },
-
-    //Réinitilisation de mot de passe
-    {path:'forgot-password', component: ForgotPasswordComponent},
-    { path: 'reset-password', component: ResetPasswordComponent }, // Route pour la réinitialisation
-
-
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'sidebar', component: SidebarComponent },
+  { path: 'navbar', component: NavbarComponent },
+  { path: 'presence', component: PresenceComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'utilisateur', component: UtilisateurComponent },
+  { path: 'departement', component: DepartementComponent },
+  { path: 'cohorte', component: CohorteComponent },
+  { path: 'historique', component: HistoriqueComponent },
+  { path: 'inscription', component: InscriptionComponent },
+  { path: 'add-departement', component: AddDepartementComponent },
+  { path: 'dashboard-vigile', component: DashboardVigileComponent },
+  { path: 'add-cohorte', component: AddCohorteComponent },
+  { path: 'edit/:id', component: EditComponent },
+  { path: 'edit-cohorte/:id', component: EditCohorteComponent },
+  { path: 'employee-list/:id', component: EmployeeListComponent },
+  { path: 'departements/:departmentName/employees', component: EmployeeListComponent },
+  { path: 'cohortes/:cohorteName/apprenants', component: ApprenantListCohorteComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent }
 ];
