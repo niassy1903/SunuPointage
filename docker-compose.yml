@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=mongodb
+      - MONGO_DB_HOST=mongodb
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_DATABASE=sunupointage
+      - MONGO_DB_USERNAME=
+      - MONGO_DB_PASSWORD=
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    command: ["/usr/local/bin/wait-for-it.sh", "mongodb:27017", "--", "php", "artisan", "migrate"]
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "4200:80"
+    networks:
+      - app-network
+
+  arduino:
+    build:
+      context: ./frontend/arduino
+    container_name: arduino
+    ports:
+      - "3000:3000"
+    volumes:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    command: ["--wiredTigerCacheSizeGB", "1"]
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
