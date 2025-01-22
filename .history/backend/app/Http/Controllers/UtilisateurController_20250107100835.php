@@ -99,7 +99,7 @@ class UtilisateurController extends Controller
             'token' => $jwt,
         ]);
     }
-}
+
 
 
     public function store(Request $request)

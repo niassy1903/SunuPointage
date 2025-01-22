@@ -247,12 +247,12 @@ export class UtilisateurComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      this.readCSVFile(file);
+      //this.readCSVFile(file);
     }
   }
 
   // Méthode pour lire et traiter le fichier CSV
-  readCSVFile(file: File) {
+  /*readCSVFile(file: File) {
     Papa.parse(file, {
       header: true,
       complete: (results) => {
@@ -274,5 +274,5 @@ export class UtilisateurComponent implements OnInit {
         console.error('Erreur lors de la lecture du fichier CSV:', error);
       }
     });
-  }
+  }*/
 }

@@ -29,20 +29,19 @@ return [
     |
     */
 
-    'connections' => [
-        // Autres connexions...
-        
-        'mongodb' => [
-            'driver' => 'mongodb',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', 27017),
-            'database' => env('DB_DATABASE', 'sunu_pointage'),
-            'username' => env('DB_USERNAME', 'ndiawar'),
-            'password' => env('DB_PASSWORD', 'yaneFaye;79Pi'),
-            'options' => [
-                'database' => env('DB_AUTHENTICATION_DATABASE', 'admin'), // Base de données utilisée pour l'authentification
-            ],
+ 'connections' => [
+    'mongodb' => [
+        'driver' => 'mongodb',
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', 27017),
+        'database' => env('DB_DATABASE', 'forge'),
+        'username' => env('DB_USERNAME', 'forge'),
+        'password' => env('DB_PASSWORD', ''),
+        'options' => [
+            'database' => env('DB_AUTHENTICATION_DATABASE', 'admin'),
         ],
+    ],
+
 
         'mysql' => [
             'driver' => 'mysql',
